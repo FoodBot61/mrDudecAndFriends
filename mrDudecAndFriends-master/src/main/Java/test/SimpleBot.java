@@ -14,6 +14,7 @@ import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.api.methods.BotApiMethod;
 import org.telegram.telegrambots.api.methods.send.SendAudio;
 import org.telegram.telegrambots.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.TelegramBotsApi;
@@ -26,7 +27,7 @@ import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 import test.BD;
 import static java.lang.System.exit;
-
+import test.Logging;
 /**
  * Created by User on 08.01.2017.
  */
@@ -35,9 +36,7 @@ public class SimpleBot extends TelegramLongPollingBot {
 
 
 
-        public static void main(String[] args) {
-
-
+        public static void main(String[] args) throws IOException {
             ApiContextInitializer.init();
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
             try {
@@ -65,10 +64,11 @@ public class SimpleBot extends TelegramLongPollingBot {
         public void onUpdateReceived(Update update) {
             Message message = update.getMessage();
            String cmd = message.getText();
-SimpleBot simpleBot = new SimpleBot();
+      SimpleBot simpleBot = new SimpleBot();
         simpleBot.sshaasd(update);
+        Logging log = new Logging();
 
-            if (message != null && message.hasText()) {
+            if (message != null && message.hasText() && message.getText().contains("/")) {
 
                 switch (cmd) {
                     case "привет":
@@ -84,9 +84,10 @@ SimpleBot simpleBot = new SimpleBot();
                         sendMsg(message, "gejgiejig");
                         break;
                     default:
-                        sendMsg(message, "Я не знаю что ответить на это");
+                        sendMsg(message, "Нет такой команды. Для полного списка команд используйте /help");
                 }
             }
+  //      log.log(message); ЛОГИРОВАНИЕ =-))))))))))))))))))))))))))
         }
 
 
@@ -107,25 +108,36 @@ SimpleBot simpleBot = new SimpleBot();
 public void sshaasd(Update update){
     BD bd = new BD();
     bd.BDsher();
-    String sf="Пицца";
+
     Message message = update.getMessage();
-try{
-   String sql = "SELECT * FROM `dish` WHERE `dish_name`='Cуп харчо'";
-    BD.rs = BD.stmt.executeQuery(sql);
-    while (BD.rs.next()) {
-        String count = BD.rs.getString(1) + " "+ BD.rs.getString(2) + " "+ BD.rs.getString(4)+ " "+BD.rs.getString(5)+ " "+BD.rs.getString(6);
-       // java.sql.Blob fsd = BD.rs.getBlob(3);
-        System.out.println("Total number of books in the table : " + count);
-        sendMsg(message,count);
+    String sf=message.getText(); // ПОИСК БЛЮДА ПО НАЗВАНИЮ
+//    System.out.println(message.getText()); Может нужно для log
+
+    if(message.getText().equalsIgnoreCase(sf))
+    {
+        try {
+            String sql = "SELECT * FROM `dish` WHERE dish_name='"+sf+"' ";
+            BD.rs = BD.stmt.executeQuery(sql);
+            while (BD.rs.next()) {
+                String count = BD.rs.getString(1) + " " + BD.rs.getString(2) + " " + BD.rs.getString(4) + " " + BD.rs.getString(5) + " " + BD.rs.getString(6);
+                // java.sql.Blob fsd = BD.rs.getBlob(3);
+                System.out.println("Total number of books in the table : " + count);
+                sendMsg(message, count);
+
+            }
+        } catch (SQLException sqlEx) {
+            sqlEx.printStackTrace();
+        }
+    }
+else {
+
+//        System.out.println(message.getText()+"sosizui");    ОБРАТОКА ОШИБКИ 1: НЕ ПРОШЕЛ ЗАПРОС
+    }
 
     }
-    } catch (SQLException sqlEx) {
-        sqlEx.printStackTrace();
-    }
 
-
-    }
 }
+
 
 
 
