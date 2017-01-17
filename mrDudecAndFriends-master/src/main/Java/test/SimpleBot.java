@@ -87,8 +87,16 @@ public class SimpleBot extends TelegramLongPollingBot {
                         sendMsg(message, "Нет такой команды. Для полного списка команд используйте /help");
                 }
             }
-  //      log.log(message); ЛОГИРОВАНИЕ =-))))))))))))))))))))))))))
+
+
+        try {
+            log.log(message);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
+
+    }
 
 
 
@@ -110,13 +118,13 @@ public void sshaasd(Update update){
     bd.BDsher();
 
     Message message = update.getMessage();
-    String sf=message.getText(); // ПОИСК БЛЮДА ПО НАЗВАНИЮ
+    String msgText=message.getText(); // ПОИСК БЛЮДА ПО НАЗВАНИЮ
 //    System.out.println(message.getText()); Может нужно для log
 
-    if(message.getText().equalsIgnoreCase(sf))
+    if(message.getText().equalsIgnoreCase(msgText))
     {
         try {
-            String sql = "SELECT * FROM `dish` WHERE dish_name='"+sf+"' ";
+            String sql = "SELECT * FROM `dish` WHERE dish_name='"+msgText+"' ";
             BD.rs = BD.stmt.executeQuery(sql);
             while (BD.rs.next()) {
                 String count = BD.rs.getString(1) + " " + BD.rs.getString(2) + " " + BD.rs.getString(4) + " " + BD.rs.getString(5) + " " + BD.rs.getString(6);
