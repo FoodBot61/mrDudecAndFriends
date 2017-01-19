@@ -67,13 +67,10 @@ public class SimpleBot extends TelegramLongPollingBot {
       SimpleBot simpleBot = new SimpleBot();
         simpleBot.sshaasd(update);
         Logging log = new Logging();
-
+        UserIntoBD us= new UserIntoBD();
             if (message != null && message.hasText() && message.getText().contains("/")) {
 
                 switch (cmd) {
-                    case "привет":
-                        sendMsg(message, "Привет, проголодался?");
-                        break;
                     case "/help":
                         sendMsg(message, "top5 - выводит топ 102000000 блюд \n help - выводит список команд \n favlist - бла бла бла ");
                         break;
@@ -88,9 +85,16 @@ public class SimpleBot extends TelegramLongPollingBot {
                 }
             }
 
-
+        if(message.getText().equalsIgnoreCase("привет")){
+            sendMsg(message, "Привет, проголодался?");
+        }
         try {
-            log.log(message);
+            us.usrintbd(message);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+          log.log(message);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -127,6 +131,7 @@ public void sshaasd(Update update){
             String sql = "SELECT * FROM `dish` WHERE dish_name='"+msgText+"' ";
             BD.rs = BD.stmt.executeQuery(sql);
             while (BD.rs.next()) {
+
                 String count = BD.rs.getString(1) + " " + BD.rs.getString(2) + " " + BD.rs.getString(4) + " " + BD.rs.getString(5) + " " + BD.rs.getString(6);
                 // java.sql.Blob fsd = BD.rs.getBlob(3);
                 System.out.println("Total number of books in the table : " + count);

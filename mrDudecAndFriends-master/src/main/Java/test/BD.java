@@ -18,10 +18,6 @@ public class BD {
     static Statement stmt;
     static ResultSet rs;
 
-    public static void main(String args[]) {
-BD bd = new BD();
-        bd.BDsher();
-    }
     public void BDsher()
     {
         try {
@@ -30,46 +26,20 @@ BD bd = new BD();
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("Cannot find the driver in the classpath!", e);
         }
-//
+
         try {
-
-
-//             opening database connection to MySQL server
             con = DriverManager.getConnection(url, user, password);
             if (con != null) {
                 System.out.println("Лучше бы на повара пошёл");
             } else {
                 System.out.println("А нет!");
             }
-            // getting Statement object to execute query
+
         stmt = con.createStatement();
-//
-//             //executing SELECT query
-//            String sql;
-//            sql = "SELECT dish_name FROM dish WHERE id IN (1,3)";rs = stmt.executeQuery(sql);
-//            while (rs.next()) {
-//                String count = rs.getString(1);
-//                System.out.println("Total number of books in the table : " + count);
-//            }
         } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
         }
-//        finally {
-//            //close connection ,stmt and resultset here
-//            try {
-//                con.close();
-//            } catch (SQLException se) { /*can't do anything */ }
-//            try {
-//                stmt.close();
-//            } catch (SQLException se) { /*can't do anything */ }
-//            try {
-//                rs.close();
-//            } catch (SQLException se) { /*can't do anything */ }
-//
-//
-//        }
     }
-
 }
 
 
