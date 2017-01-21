@@ -26,8 +26,6 @@ public class Logging extends SimpleBot {
             System.out.println(fullmsg);
             String msgText = message.getText();
             String adress = "SELECT adress FROM user WHERE id=104730502";// АДРЕС CLIENT
-            String fn = "SELECT first_name FROM user WHERE id='"+user_id+"'";
-            String ln = "SELECT last_name FROM user WHERE id='"+user_id+"'";
             Pattern p = Pattern.compile("id=[0-9]+,");
             Matcher m = p.matcher(fullmsg);
             if (m.find()) {
@@ -43,10 +41,12 @@ public class Logging extends SimpleBot {
                 price = BD.rs.getInt(5);
                 idDish = BD.rs.getInt(1);
                 }
+        String fn = "SELECT first_name FROM user WHERE id='"+user_id+"'";
+        String ln = "SELECT last_name FROM user WHERE id='"+user_id+"'";
             BD.rs=BD.stmt.executeQuery(fn);
             while (BD.rs.next()) {
-                user_name = BD.rs.getString(1);
-            }
+            user_name = BD.rs.getString(1);
+        }
             BD.rs=BD.stmt.executeQuery(ln);
             while (BD.rs.next()) {
                 user_secname=BD.rs.getString(1);
