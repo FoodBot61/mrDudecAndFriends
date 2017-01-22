@@ -19,40 +19,32 @@ public class SuperKeyWord {
     String f1;
     List rowValues = new ArrayList();
     List rowValues1 = new ArrayList();
-    public String[] findShaurma(Message message) throws SQLException {
 
+    public String[] findShaurma(Message message) throws SQLException,NullPointerException{
         String sql1="SELECT word FROM ` key_words` WHERE 1";
-        BD.rs= BD.stmt.executeQuery(sql1);while (BD.rs.next()) {
+        BD.rs= BD.stmt.executeQuery(sql1);
+        while (BD.rs.next()) {
             rowValues1.add(BD.rs.getString(1));
         }
         f = (String[]) rowValues1.toArray(new String[rowValues.size()]);
         for (int i = 0; i < rowValues1.size(); i++) {
-            //System.out.println (l[i]);
-            f1 = f[i];
-
-System.out.println(f1+"f1s");
-
-        String msgText = message.getText();
-        if (msgText.toLowerCase().contains(f1)) {
-
-            System.out.println(f1+"FF");
-            String sql = "SELECT dish_name FROM ` key_words`,`dish` WHERE dish.id_keyword=` key_words`.`id` and word='" + f1 + "'";// АДРЕС CLIENT
-            BD.rs = BD.stmt.executeQuery(sql);
-
-            while (BD.rs.next()) {
-                rowValues.add(BD.rs.getString(1));
+            f1 = f[i];//КЛЮЧЕВЫЕ СЛОВА
+            String msgText = message.getText();
+            if (msgText.toLowerCase().contains(f1)) {
+                String sql = "SELECT dish_name FROM ` key_words`,`dish` WHERE dish.id_keyword=` key_words`.`id` and word='" + f1 + "'";// АДРЕС CLIENT
+                BD.rs = BD.stmt.executeQuery(sql);
+                    while (BD.rs.next()) {
+                        rowValues.add(BD.rs.getString(1));
+                    }
+        // You can then put this back into an array if necessary
+                    p = (String[]) rowValues.toArray(new String[rowValues.size()]);
             }
-// You can then put this back into an array if necessary
-            p = (String[]) rowValues.toArray(new String[rowValues.size()]);
+            for (int i1 = 0; i1 < rowValues.size(); i1++) {
+                p1 = p[i1];
+                System.out.println (p[i1]);//БЛЮДА ПО КЛЮЧЕВЫМ СЛОВАМ(sup)
+            }
 
-        }
-        for (int i1 = 0; i1 < rowValues.size(); i1++) {
-
-            p1 = p[i1];
-            System.out.println (p[i1]);
-        }
         }
         return p;
-
     }
 }

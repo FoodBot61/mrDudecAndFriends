@@ -1,5 +1,6 @@
 package sd;
 import java.io.IOException;
+import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,7 +33,8 @@ import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 public class SimpleBot extends TelegramLongPollingBot {
     String user_id;
     String user_name;
-
+    int i;
+    String s[];
 
         public static void main(String[] args) throws IOException {
             ApiContextInitializer.init();
@@ -77,14 +79,13 @@ public class SimpleBot extends TelegramLongPollingBot {
     @Override
         public void onUpdateReceived(Update update) {
             Message message = update.getMessage();
-           String cmd = message.getText();
+            String cmd = message.getText();
             SimpleBot simpleBot = new SimpleBot();
-            simpleBot.sshaasd(update);
             Logging log = new Logging();
-            UserIntoBD us= new UserIntoBD();
+            UserIntoBD us = new UserIntoBD();
             SuperKeyWord keyw = new SuperKeyWord();
-
-
+            DishFromKeyW keee = new DishFromKeyW();
+            simpleBot.sshaasd(update);
                     if (message != null && message.hasText() && message.getText().contains("/")) {
                 switch (cmd) {
                     case "/help":
@@ -111,6 +112,7 @@ public class SimpleBot extends TelegramLongPollingBot {
 
         if(message.getText().equalsIgnoreCase("привет")){
             sendMsg(message, "Привет, проголодался?");
+            sendMsg(message, "http://minionomaniya.ru/wp-content/uploads/2016/01/%D0%9A%D0%B5%D0%B2%D0%B8%D0%BD.jpg");
         }
         try {
             us.usrintbd(message);
@@ -122,15 +124,27 @@ public class SimpleBot extends TelegramLongPollingBot {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        try {;
-          String s[] = keyw.findShaurma(message);
-            for (int i=0;i<s.length;i++) {
-              sendMsg(message,(i+1 +  " " + s[i]));
+        try {
+            s = keyw.findShaurma(message);
+            if (s == null) {
+                System.out.println("AHAHAHAHAHHAHAHAH miss");
+            } else {
+                try {
+                    keee.howver(message);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
 
+                for (i = 0; i < s.length; i++) {
+                    sendMsg(message, (i + 1 + " " + s[i]));
+                    sendMsg(message, "Введите цифру или название блюда");
+                }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            
+            } catch(SQLException e){
+                e.printStackTrace();
+            }
+
     }
 
     private  void sendMsg(Message message, String text) {
@@ -148,9 +162,6 @@ public class SimpleBot extends TelegramLongPollingBot {
 
 
 public void sshaasd(Update update){
-    BD bd = new BD();
-    bd.BDsher();
-
     Message message = update.getMessage();
     String msgText=message.getText(); // ПОИСК БЛЮДА ПО НАЗВАНИЮ
 //    System.out.println(message.getText()); Может нужно для log

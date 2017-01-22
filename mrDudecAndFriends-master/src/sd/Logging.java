@@ -14,14 +14,12 @@ import java.io.File;
  * Created by user on 15.01.2017.
  */
 public class Logging extends SimpleBot {
-    String user_name;
-    String user_secname;
-    String user_id="1";
+    private String user_name;
+    private String user_secname;
+    private String user_id="1";
     public void log(Message message) throws SQLException {
             int idDish = 1;
             int price = 0;
-            BD bd = new BD();
-            bd.BDsher();
             String fullmsg = message.toString();
             System.out.println(fullmsg);
             String msgText = message.getText();
