@@ -63,14 +63,7 @@ public class Logging extends SimpleBot {
                             " `adress` = '" + adress + "'," +
                             " `id_dish` = '" + idDish + "' ";
                 BD.stmt.executeUpdate(sql);
-
-                if (BD.stmt != null) {
-                    System.out.println("eeeeee rock" + msgText);
-
-                } else {
-                    System.out.println("=-(");
-                }
-                } catch (SQLException sqlEx) {
+            } catch (SQLException sqlEx) {
                     sqlEx.printStackTrace();
                 }
             }
