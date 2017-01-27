@@ -21,7 +21,7 @@ public class Logging extends SimpleBot {
             int idDish = 1;
             int price = 0;
             String fullmsg = message.toString();
-            System.out.println(fullmsg);
+            //System.out.println(fullmsg); Сводка по сообщению
             String msgText = message.getText();
             String adress = "SELECT adress FROM user WHERE id=104730502";// АДРЕС CLIENT
             Pattern p = Pattern.compile("id=[0-9]+,");
@@ -29,8 +29,6 @@ public class Logging extends SimpleBot {
             if (m.find()) {
                 user_id = fullmsg.substring(m.start() + 3, m.end() - 1);
             }
-
-            System.out.println(user_id);
             int date = message.getDate();
             String dishname = "SELECT * FROM dish WHERE dish_name = '" + msgText + "'";
             System.out.println(msgText);

@@ -71,7 +71,7 @@ public class SimpleBot extends TelegramLongPollingBot {
         Logging log = new Logging();
         UserIntoBD us = new UserIntoBD();
         SuperKeyWord keyw = new SuperKeyWord();
-        TestDish td = new TestDish();
+        Dish td = new Dish();
         if (message != null && message.hasText() && message.getText().contains("/")) {
             switch (cmd) {
                 case "/help":
@@ -106,11 +106,7 @@ public class SimpleBot extends TelegramLongPollingBot {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        try {
-            log.log(message);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
 
         try {
             DishName = td.TestDish(message);
@@ -123,16 +119,21 @@ public class SimpleBot extends TelegramLongPollingBot {
 
         for (i = 0; i < DishName.length; i++) {
 
-            if ((message.getText().equalsIgnoreCase(DishName[i]))) {
+            if ((message.getText().contains(DishName[i]))) {
 
                 String takefoodforname = "SELECT * FROM `dish` WHERE dish_name ='"+DishName[i]+"'";
-                System.out.print(DishName[i]+"test");
+
                 try {
                     BD.rs=BD.stmt.executeQuery(takefoodforname);
                     while (BD.rs.next())
                     {
-                        sendMsg(message,BD.rs.getString(2) + " " + BD.rs.getString(4) + " " + BD.rs.getString(5) + " " + BD.rs.getString(6));
+                        sendMsg(message,"Название : " +BD.rs.getString(2) + "\n"+  "Описание : " +  BD.rs.getString(4) +"\n" + "Цена :"  + BD.rs.getString(5) +"\n" + "Ингридиенты :" +BD.rs.getString(6));
 
+                    }
+                    try {
+                        log.log(message);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
                     }
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -141,9 +142,7 @@ public class SimpleBot extends TelegramLongPollingBot {
             }
 
         }
-System.out.print(a);
         if (!a) {
-
 
             try {
 
