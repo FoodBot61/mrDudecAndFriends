@@ -27,6 +27,7 @@ public class Logging extends SimpleBot {
     String LastName;
     String takefoodforname;
     Dish td;
+    int amount;
 
     public void log(Message message) throws SQLException {
         String fullmsg = message.toString();

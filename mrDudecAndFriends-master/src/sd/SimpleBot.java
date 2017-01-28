@@ -1,9 +1,11 @@
 package sd;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.concurrent.SynchronousQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jdk.management.resource.internal.TotalResourceContext;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.TelegramBotsApi;
@@ -28,7 +30,7 @@ public class SimpleBot extends TelegramLongPollingBot {
     String Dishes = " ";
     int TotalPrice;
     //ТЕСТ ПЕРЕМЕННЫЕ
-  
+
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
@@ -36,9 +38,7 @@ public class SimpleBot extends TelegramLongPollingBot {
             telegramBotsApi.registerBot(new SimpleBot());
         } catch (TelegramApiException e) {
             e.printStackTrace();
-
         }
-
     }
 
     @Override
@@ -117,29 +117,41 @@ public class SimpleBot extends TelegramLongPollingBot {
                     BD.rs=BD.stmt.executeQuery(takefoodforname);
                     while (BD.rs.next())
                     {
-                        sendMsg(message,"\n"+"\n"+"\n"+"Название : " +BD.rs.getString(2) + "\n"+  "Описание : " +  BD.rs.getString(4) +"\n" + "Цена :"  + BD.rs.getInt(5)  +"\n"+ "Ингридиенты  :"  +BD.rs.getString(6)+"\n"+"Фото : " +BD.rs.getString(3));
+                        sendMsg(message,"\n"+"\n"+"\n"+"Название : " +BD.rs.getString(2) + "\n"+  "Описание : " +  BD.rs.getString(4) +"\n" + "Цена :"  + BD.rs.getInt(5) +" rub "  +"\n"+ "Ингридиенты  :"  +BD.rs.getString(6)+"\n"+"Фото : " +BD.rs.getString(3));
 
-                        Dishes = BD.rs.getString(2)+ "|" + Dishes ;
+                        Dishes = BD.rs.getString(2)+ " | " + Dishes ;
                         TotalPrice= BD.rs.getInt(5)+TotalPrice;
                     }
-
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-
-                sendMsg(message,"Итоговая стоимость = " +TotalPrice + "rub");// отсюда и пляши, дядя
+                sendMsg(message,"Итоговая стоимость = " +TotalPrice + " rub");// отсюда и пляши, дядя
                 sendMsg(message,"Итоговый заказ : " + Dishes);
+
                 a=true;
+
             }
 
-
         }
+
         try {
             log.log(message);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        if(message.getText().equals("STOP"))
+        {
+            if(Dishes!=null&&TotalPrice!=0) {
+                sendMsg(message, "Ваш заказ : " + Dishes + " " +"на сумму"+ TotalPrice + " rub");
+                TotalPrice = 0;
+                Dishes = null;
+            }
+            else
+            {
+                sendMsg(message,"Закажите что-нибудь.Надо поесть");
+            }
+        }
 
         if (!a) {
             try {
