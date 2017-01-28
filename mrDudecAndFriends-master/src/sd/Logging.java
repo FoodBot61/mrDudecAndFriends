@@ -16,7 +16,7 @@ import java.io.File;
 public class Logging extends SimpleBot {
     private String user_name;
     private String user_secname;
-    private String user_id="1";
+    private String user_id = "1";
     int price;
     int idDish;
     int date;
@@ -27,6 +27,7 @@ public class Logging extends SimpleBot {
     String LastName;
     String takefoodforname;
     Dish td;
+
     public void log(Message message) throws SQLException {
         String fullmsg = message.toString();
         //System.out.println(fullmsg); Сводка по сообщению
@@ -39,8 +40,20 @@ public class Logging extends SimpleBot {
         }
         date = message.getDate();
         td = new Dish();
+        FirstName = "SELECT first_name FROM user WHERE id='" + user_id + "'";
+        LastName = "SELECT last_name FROM user WHERE id='" + user_id + "'";
+        BD.rs = BD.stmt.executeQuery(FirstName);
+
+        while (BD.rs.next()) {
+            user_name = BD.rs.getString(1);
+        }
+        BD.rs = BD.stmt.executeQuery(LastName);
+
+        while (BD.rs.next()) {
+            user_secname = BD.rs.getString(1);
+        }
         try {
-            DishName = td.TestDish(message);
+            DishName = td.TestDish();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -53,41 +66,39 @@ public class Logging extends SimpleBot {
                     price = BD.rs.getInt(5);
                     idDish = BD.rs.getInt(1);
                 }
+                try {
+                    String sql = "INSERT INTO log " +
+                            "SET" +
+                            " user_id = '" + user_id + "'," +
+                            " user_name = '" + user_name + "'," +
+                            " user_secname = '" + user_secname + "', " +
+                            " `dish` = '" + dish + "'," +
+                            " `date_msg` = '" + String.valueOf(date) + "'," +
+                            " `price` =  '" + price + "', " +
+                            " `amount` = 1," +
+                            " `id_res` = 1," +
+                            " `adress` = '" + adress + "'," +
+                            " `id_dish` = '" + idDish +   "' ";
+                        BD.stmt.executeUpdate(sql);
+                    } catch (SQLException sqlEx) {
+                        sqlEx.printStackTrace();
+                    }
+                }
             }
         }
-
-
-            System.out.println(msgText);
-            FirstName = "SELECT first_name FROM user WHERE id='" + user_id + "'";
-            LastName = "SELECT last_name FROM user WHERE id='" + user_id + "'";
-            BD.rs = BD.stmt.executeQuery(FirstName);
-            while (BD.rs.next()) {
-                user_name = BD.rs.getString(1);
-            }
-            BD.rs = BD.stmt.executeQuery(LastName);
-            while (BD.rs.next()) {
-                user_secname = BD.rs.getString(1);
-            }
-            try {
-                String sql = "INSERT INTO log " +
-                        "SET" +
-                        " user_id = '" + user_id + "'," +
-                        " user_name = '" + user_name + "'," +
-                        " user_secname = '" + user_secname + "', " +
-                        " `dish` = '" + dish + "'," +
-                        " `date_msg` = '" + String.valueOf(date) + "'," +
-                        " `price` =  '" + price + "', " +
-                        " `amount` = 1," +
-                        " `id_res` = 1," +
-                        " `adress` = '" + adress + "'," +
-                        " `id_dish` = '" + idDish + "' ";
-                BD.stmt.executeUpdate(sql);
-            } catch (SQLException sqlEx) {
-                sqlEx.printStackTrace();
-            }
-
     }
-    }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

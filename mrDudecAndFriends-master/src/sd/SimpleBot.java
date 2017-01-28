@@ -26,6 +26,8 @@ public class SimpleBot extends TelegramLongPollingBot {
 
     boolean a;
     //ТЕСТ ПЕРЕМЕННЫЕ
+
+    String takefoodforname;
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
@@ -37,7 +39,6 @@ public class SimpleBot extends TelegramLongPollingBot {
         }
 
     }
-
 
     @Override
     public String getBotUsername() {
@@ -63,7 +64,6 @@ public class SimpleBot extends TelegramLongPollingBot {
             user_name = BD.rs.getString(1);
         }
     }
-
 
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
@@ -95,46 +95,29 @@ public class SimpleBot extends TelegramLongPollingBot {
                     sendMsg(message, "Нет такой команды. Для полного списка команд используйте /help");
             }
         }
-
         if (message.getText().equalsIgnoreCase("привет")) {
             sendMsg(message, "Привет, проголодался?");
             sendMsg(message, "http://minionomaniya.ru/wp-content/uploads/2016/01/%D0%9A%D0%B5%D0%B2%D0%B8%D0%BD.jpg");
         }
-
         try {
             us.usrintbd(message);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
         try {
-            DishName = td.TestDish(message);
-
-
+            DishName = td.TestDish();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
         for (i = 0; i < DishName.length; i++) {
             if ((message.getText().contains(DishName[i]))) {
-
-                String takefoodforname = "SELECT * FROM `dish` WHERE dish_name ='"+DishName[i]+"'";
-
+                takefoodforname = "SELECT * FROM `dish` WHERE dish_name ='"+DishName[i]+"'";
                 try {
                     BD.rs=BD.stmt.executeQuery(takefoodforname);
                     while (BD.rs.next())
                     {
                         sendMsg(message,"Название : " +BD.rs.getString(2) + "\n"+  "Описание : " +  BD.rs.getString(4) +"\n" + "Цена :"  + BD.rs.getString(5) +"\n" + "Ингридиенты :" +BD.rs.getString(6));
-
                     }
-                    try {
-                        log.log(message);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -142,11 +125,13 @@ public class SimpleBot extends TelegramLongPollingBot {
             }
 
         }
-
+        try {
+            log.log(message);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         if (!a) {
-
             try {
-
                 Keywords = keyw.findShaurma(message);
                 if (Keywords == null) {
                     sendMsg(message, "Ну что ты,бабуин введи что нибудь нормальное");
@@ -154,25 +139,15 @@ public class SimpleBot extends TelegramLongPollingBot {
                 } else {
                     for (i = 0; i < Keywords.length; i++) {
                         sendMsg(message, (i + 1 + " " + Keywords[i]));
-
                     }
                     sendMsg(message, "Введите название блюда");
                 }
-
-            } catch (SQLException e) {
+                 }catch (SQLException e){
                 e.printStackTrace();
             }
-
-
         }
         a=false;
     }
-
-
-
-
-
-
 
     private  void sendMsg(Message message, String text) {
             SendMessage sendMessage = new SendMessage();
@@ -186,9 +161,6 @@ public class SimpleBot extends TelegramLongPollingBot {
                 e.printStackTrace();
             }
         }
-
-
-
 }
 
 

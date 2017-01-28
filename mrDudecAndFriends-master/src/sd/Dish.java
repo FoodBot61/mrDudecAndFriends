@@ -12,7 +12,7 @@ import java.util.List;
 public class Dish {
     String [] test_dishh;
     List rowValues1 = new ArrayList();
-public String [] TestDish(Message message) throws SQLException {
+public String [] TestDish() throws SQLException {
     String sql1 = "SELECT dish_name FROM `dish` WHERE 1";
     BD.rs = BD.stmt.executeQuery(sql1);
     while (BD.rs.next()) {
