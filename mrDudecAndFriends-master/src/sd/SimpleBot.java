@@ -23,11 +23,12 @@ public class SimpleBot extends TelegramLongPollingBot {
     int i;
     String Keywords[];
     String[] DishName;
-
-    boolean a;
-    //ТЕСТ ПЕРЕМЕННЫЕ
-
     String takefoodforname;
+    boolean a;
+    String Dishes = " ";
+    int TotalPrice;
+    //ТЕСТ ПЕРЕМЕННЫЕ
+  
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
@@ -116,13 +117,21 @@ public class SimpleBot extends TelegramLongPollingBot {
                     BD.rs=BD.stmt.executeQuery(takefoodforname);
                     while (BD.rs.next())
                     {
-                        sendMsg(message,"Название : " +BD.rs.getString(2) + "\n"+  "Описание : " +  BD.rs.getString(4) +"\n" + "Цена :"  + BD.rs.getString(5) +"\n" + "Ингридиенты :" +BD.rs.getString(6));
+                        sendMsg(message,"\n"+"\n"+"\n"+"Название : " +BD.rs.getString(2) + "\n"+  "Описание : " +  BD.rs.getString(4) +"\n" + "Цена :"  + BD.rs.getInt(5)  +"\n"+ "Ингридиенты  :"  +BD.rs.getString(6)+"\n"+"Фото : " +BD.rs.getString(3));
+
+                        Dishes = BD.rs.getString(2)+ "|" + Dishes ;
+                        TotalPrice= BD.rs.getInt(5)+TotalPrice;
                     }
+
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+
+                sendMsg(message,"Итоговая стоимость = " +TotalPrice + "rub");// отсюда и пляши, дядя
+                sendMsg(message,"Итоговый заказ : " + Dishes);
                 a=true;
             }
+
 
         }
         try {
@@ -130,6 +139,8 @@ public class SimpleBot extends TelegramLongPollingBot {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+
         if (!a) {
             try {
                 Keywords = keyw.findShaurma(message);
