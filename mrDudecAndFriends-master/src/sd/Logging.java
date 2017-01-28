@@ -17,54 +17,76 @@ public class Logging extends SimpleBot {
     private String user_name;
     private String user_secname;
     private String user_id="1";
+    int price;
+    int idDish;
+    int date;
+    String dish;
+    String msgText;
+    String adress;
+    String FirstName;
+    String LastName;
+    String takefoodforname;
+    Dish td;
     public void log(Message message) throws SQLException {
-            int idDish = 1;
-            int price = 0;
-            String fullmsg = message.toString();
-            //System.out.println(fullmsg); Сводка по сообщению
-            String msgText = message.getText();
-            String adress = "SELECT adress FROM user WHERE id=104730502";// АДРЕС CLIENT
-            Pattern p = Pattern.compile("id=[0-9]+,");
-            Matcher m = p.matcher(fullmsg);
-            if (m.find()) {
-                user_id = fullmsg.substring(m.start() + 3, m.end() - 1);
-            }
-            int date = message.getDate();
-            String dishname = "SELECT * FROM dish WHERE dish_name = '" + msgText + "'";
-            System.out.println(msgText);
-            BD.rs = BD.stmt.executeQuery(dishname);
-            while (BD.rs.next()) {
-                price = BD.rs.getInt(5);
-                idDish = BD.rs.getInt(1);
-                }
-        String fn = "SELECT first_name FROM user WHERE id='"+user_id+"'";
-        String ln = "SELECT last_name FROM user WHERE id='"+user_id+"'";
-            BD.rs=BD.stmt.executeQuery(fn);
-            while (BD.rs.next()) {
-            user_name = BD.rs.getString(1);
+        String fullmsg = message.toString();
+        //System.out.println(fullmsg); Сводка по сообщению
+        msgText = message.getText();
+        adress = "SELECT adress FROM user WHERE id=104730502";// АДРЕС CLIENT
+        Pattern p = Pattern.compile("id=[0-9]+,");
+        Matcher m = p.matcher(fullmsg);
+        if (m.find()) {
+            user_id = fullmsg.substring(m.start() + 3, m.end() - 1);
         }
-            BD.rs=BD.stmt.executeQuery(ln);
+        date = message.getDate();
+        td = new Dish();
+        try {
+            DishName = td.TestDish(message);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        for (i = 0; i < DishName.length; i++) {
+            if ((message.getText().contains(DishName[i]))) {
+                takefoodforname = "SELECT * FROM `dish` WHERE dish_name ='" + DishName[i] + "'";
+                BD.rs = BD.stmt.executeQuery(takefoodforname);
+                while (BD.rs.next()) {
+                    dish = BD.rs.getString(2);
+                    price = BD.rs.getInt(5);
+                    idDish = BD.rs.getInt(1);
+                }
+            }
+        }
+
+
+            System.out.println(msgText);
+            FirstName = "SELECT first_name FROM user WHERE id='" + user_id + "'";
+            LastName = "SELECT last_name FROM user WHERE id='" + user_id + "'";
+            BD.rs = BD.stmt.executeQuery(FirstName);
             while (BD.rs.next()) {
-                user_secname=BD.rs.getString(1);
+                user_name = BD.rs.getString(1);
+            }
+            BD.rs = BD.stmt.executeQuery(LastName);
+            while (BD.rs.next()) {
+                user_secname = BD.rs.getString(1);
             }
             try {
-                    String sql = "INSERT INTO log " +
-                            "SET" +
-                            " user_id = '" + user_id + "'," +
-                            " user_name = '" + user_name + "'," +
-                            " user_secname = '" + user_secname + "', " +
-                            " `text_msg` = '" + msgText + "'," +
-                            " `date_msg` = '" + String.valueOf(date) + "'," +
-                            " `price` =  '" + price + "', " +
-                            " `amount` = 1," +
-                            " `id_res` = 1," +
-                            " `adress` = '" + adress + "'," +
-                            " `id_dish` = '" + idDish + "' ";
+                String sql = "INSERT INTO log " +
+                        "SET" +
+                        " user_id = '" + user_id + "'," +
+                        " user_name = '" + user_name + "'," +
+                        " user_secname = '" + user_secname + "', " +
+                        " `dish` = '" + dish + "'," +
+                        " `date_msg` = '" + String.valueOf(date) + "'," +
+                        " `price` =  '" + price + "', " +
+                        " `amount` = 1," +
+                        " `id_res` = 1," +
+                        " `adress` = '" + adress + "'," +
+                        " `id_dish` = '" + idDish + "' ";
                 BD.stmt.executeUpdate(sql);
             } catch (SQLException sqlEx) {
-                    sqlEx.printStackTrace();
-                }
+                sqlEx.printStackTrace();
             }
+
+    }
     }
 
 

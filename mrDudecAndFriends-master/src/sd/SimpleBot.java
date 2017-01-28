@@ -118,7 +118,6 @@ public class SimpleBot extends TelegramLongPollingBot {
 
 
         for (i = 0; i < DishName.length; i++) {
-
             if ((message.getText().contains(DishName[i]))) {
 
                 String takefoodforname = "SELECT * FROM `dish` WHERE dish_name ='"+DishName[i]+"'";
@@ -135,6 +134,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
+
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -142,6 +142,7 @@ public class SimpleBot extends TelegramLongPollingBot {
             }
 
         }
+
         if (!a) {
 
             try {
@@ -157,8 +158,6 @@ public class SimpleBot extends TelegramLongPollingBot {
                     }
                     sendMsg(message, "Введите название блюда");
                 }
-//                if (message.getText().equalsIgnoreCase())
-
 
             } catch (SQLException e) {
                 e.printStackTrace();
