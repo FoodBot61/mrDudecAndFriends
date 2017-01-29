@@ -51,20 +51,14 @@ public class SimpleBot extends TelegramLongPollingBot {
         return "316708819:AAEdaPqrGqRt7E7Kpg0oXosJrjcQyjm5FUY";
     }
 
-    public void hello(Message message) throws SQLException {
+    public void hello(Message message) {
         String message1 = message.toString();
-        Pattern p = Pattern.compile("id=[0-9]+,");
+        Pattern p = Pattern.compile("firstName='[^0-9]+'+,+.l");
         Matcher m = p.matcher(message1);
         if (m.find()) {
-            user_id = message1.substring(m.start() + 3, m.end() - 1);
-            System.out.println(user_id + "fsdf");
+            user_name = message1.substring(m.start()+11,m.end()-4);
         }
-        String sql = "SELECT first_name FROM `user` WHERE id='" + user_id + "' ";
-        BD.rs = BD.stmt.executeQuery(sql);
-        while (BD.rs.next()) {
-            user_name = BD.rs.getString(1);
-        }
-    }
+            }
 
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
@@ -73,6 +67,7 @@ public class SimpleBot extends TelegramLongPollingBot {
         UserIntoBD us = new UserIntoBD();
         SuperKeyWord keyw = new SuperKeyWord();
         Dish td = new Dish();
+
         if (message != null && message.hasText() && message.getText().contains("/")) {
             switch (cmd) {
                 case "/help":
@@ -82,12 +77,15 @@ public class SimpleBot extends TelegramLongPollingBot {
                     sendMsg(message, "gjkndgnuidfvdsvsdvsdvsdvsdvsd");
                     break;
                 case "/start":
-                    try {
-                        hello(message);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                    hello(message);
                     sendMsg(message, "Привет," + user_name);
+                   sendMsg(message, "Cписок команд:  \n\n" +
+                            "top5 - выводит топ 102000000 блюд"+
+                           "\nhelp - выводит список команд"+
+                           "\nfavlist - бла бла бла \n\n"+
+                           "\t Описание работы с ботом \n\n"+
+                           "Для начала заказа введите ключевые слова или названия блюд." +
+                           "\nДля того чтобы заверишь заказ введите STOP.\nЧтобы убрать блюдо из общей корзины");
                     break;
                 case "/favlist":
                     sendMsg(message, "gejgiejig");
