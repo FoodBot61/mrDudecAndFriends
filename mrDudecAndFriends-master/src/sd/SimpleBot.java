@@ -1,12 +1,12 @@
 package sd;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.concurrent.SynchronousQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jdk.management.resource.internal.TotalResourceContext;
 import org.telegram.telegrambots.ApiContextInitializer;
+import org.telegram.telegrambots.api.methods.send.SendContact;
+import org.telegram.telegrambots.api.objects.Contact;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -29,7 +29,13 @@ public class SimpleBot extends TelegramLongPollingBot {
     boolean a;
     String Dishes = " ";
     int TotalPrice;
+    String userPhone;
+    String msgText;
+    String phone;
     //ТЕСТ ПЕРЕМЕННЫЕ
+
+
+
 
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
@@ -60,6 +66,20 @@ public class SimpleBot extends TelegramLongPollingBot {
         }
             }
 
+    public String getPhoneNumb(Message message)
+    {
+        msgText=message.getText();
+        Pattern p = Pattern.compile("89.[0-9]{8}");
+        Matcher m = p.matcher(msgText);
+        if(m.find())
+        {
+            phone=msgText.substring(m.end()-11);
+            System.out.print(phone);
+        }
+        return phone;
+
+    }
+
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
         String cmd = message.getText();
@@ -71,7 +91,13 @@ public class SimpleBot extends TelegramLongPollingBot {
         if (message != null && message.hasText() && message.getText().contains("/")) {
             switch (cmd) {
                 case "/help":
-                    sendMsg(message, "top5 - выводит топ 102000000 блюд \n help - выводит список команд \n favlist - бла бла бла ");
+                    sendMsg(message, "Cписок команд:  \n\n" +
+                            "/top5 - выводит топ 102000000 блюд"+
+                            "\n/help - выводит список команд"+
+                            "\n/favlist - бла бла бла \n\n"+
+                            "\t Описание работы с ботом \n\n"+
+                            "Для начала заказа введите ключевые слова или названия блюд." +
+                            "\nДля того чтобы заверишь заказ введите STOP.\nЧтобы убрать блюдо из общей корзины");
                     break;
                 case "/top5":
                     sendMsg(message, "gjkndgnuidfvdsvsdvsdvsdvsdvsd");
@@ -79,13 +105,13 @@ public class SimpleBot extends TelegramLongPollingBot {
                 case "/start":
                     hello(message);
                     sendMsg(message, "Привет," + user_name);
-                   sendMsg(message, "Cписок команд:  \n\n" +
-                            "top5 - выводит топ 102000000 блюд"+
-                           "\nhelp - выводит список команд"+
-                           "\nfavlist - бла бла бла \n\n"+
-                           "\t Описание работы с ботом \n\n"+
-                           "Для начала заказа введите ключевые слова или названия блюд." +
-                           "\nДля того чтобы заверишь заказ введите STOP.\nЧтобы убрать блюдо из общей корзины");
+                    sendMsg(message, "Cписок команд:  \n\n" +
+                            "/top5 - выводит топ 102000000 блюд"+
+                            "\n/help - выводит список команд"+
+                            "\n/favlist - бла бла бла \n\n"+
+                            "\t Описание работы с ботом \n\n"+
+                            "Для начала заказа введите ключевые слова или названия блюд." +
+                            "\nДля того чтобы заверишь заказ введите STOP.\nЧтобы убрать блюдо из общей корзины");
                     break;
                 case "/favlist":
                     sendMsg(message, "gejgiejig");
@@ -153,18 +179,27 @@ public class SimpleBot extends TelegramLongPollingBot {
                     a = true;
 
                 }
-
             }
             if (message.getText().equals("STOP")) {
                 if (Dishes != null && TotalPrice != 0) {
                     sendMsg(message, "Ваш заказ : " + Dishes + " " + "на сумму" + TotalPrice + " rub");
                     TotalPrice = 0;
                     Dishes = "";
+                    sendMsg(message,"\nВведите номер телефона, чтобы курьер смог связаться с вами и адрес");
+
+
+//
                 } else {
                     sendMsg(message, "Закажите что-нибудь.Надо поесть");
                 }
 
             }
+           userPhone= getPhoneNumb(message);
+            System.out.print(userPhone);
+            if (message.getText().equals(userPhone)) {
+                sendMsg(message, "SHAAAAAAA");
+            }
+
 
             try {
                 log.log(message);
@@ -172,7 +207,6 @@ public class SimpleBot extends TelegramLongPollingBot {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
 
 
             if (!a) {
@@ -194,6 +228,8 @@ public class SimpleBot extends TelegramLongPollingBot {
             a = false;
         }
     }
+
+
 
     private  void sendMsg(Message message, String text) {
             SendMessage sendMessage = new SendMessage();

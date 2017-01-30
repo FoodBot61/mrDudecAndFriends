@@ -31,7 +31,7 @@ public class Logging extends SimpleBot {
 
     public void log(Message message) throws SQLException {
         String fullmsg = message.toString();
-        //System.out.println(fullmsg); Сводка по сообщению
+        //System.out.println(fullmsg); //Сводка по сообщению
         msgText = message.getText();
         adress = "SELECT adress FROM user WHERE id=104730502";// АДРЕС CLIENT
         Pattern p = Pattern.compile("id=[0-9]+,");
