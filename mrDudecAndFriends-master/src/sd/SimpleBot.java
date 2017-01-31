@@ -5,8 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.telegram.telegrambots.ApiContextInitializer;
-import org.telegram.telegrambots.api.methods.send.SendContact;
-import org.telegram.telegrambots.api.objects.Contact;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -20,7 +18,6 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 
 
 public class SimpleBot extends TelegramLongPollingBot {
-    String user_id;
     String user_name;
     int i;
     String Keywords[];
@@ -30,11 +27,8 @@ public class SimpleBot extends TelegramLongPollingBot {
     String Dishes = " ";
     int TotalPrice;
     String userPhone;
-    String msgText;
-    String phone;
-    //ТЕСТ ПЕРЕМЕННЫЕ
-
-
+    String TotalDish;
+       //ТЕСТ ПЕРЕМЕННЫЕ
 
 
     public static void main(String[] args) throws IOException {
@@ -45,7 +39,7 @@ public class SimpleBot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
-    }
+            }
 
     @Override
     public String getBotUsername() {
@@ -66,20 +60,6 @@ public class SimpleBot extends TelegramLongPollingBot {
         }
             }
 
-    public String getPhoneNumb(Message message)
-    {
-        msgText=message.getText();
-        Pattern p = Pattern.compile("89.[0-9]{8}");
-        Matcher m = p.matcher(msgText);
-        if(m.find())
-        {
-            phone=msgText.substring(m.end()-11);
-            System.out.print(phone);
-        }
-        return phone;
-
-    }
-
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
         String cmd = message.getText();
@@ -87,7 +67,7 @@ public class SimpleBot extends TelegramLongPollingBot {
         UserIntoBD us = new UserIntoBD();
         SuperKeyWord keyw = new SuperKeyWord();
         Dish td = new Dish();
-
+        GetPhoneNumber ph = new GetPhoneNumber();
         if (message != null && message.hasText() && message.getText().contains("/")) {
             switch (cmd) {
                 case "/help":
@@ -164,8 +144,8 @@ public class SimpleBot extends TelegramLongPollingBot {
                         BD.rs = BD.stmt.executeQuery(takefoodforname);
                         while (BD.rs.next()) {
                             sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n" + "Описание : " + BD.rs.getString(4) + "\n" + "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Фото : " + BD.rs.getString(3));
-
                             Dishes = BD.rs.getString(2) + " | " + Dishes;
+                            TotalDish= Dishes;
                             TotalPrice = BD.rs.getInt(5) + TotalPrice;
                         }
                     } catch (SQLException e) {
@@ -185,20 +165,21 @@ public class SimpleBot extends TelegramLongPollingBot {
                     sendMsg(message, "Ваш заказ : " + Dishes + " " + "на сумму" + TotalPrice + " rub");
                     TotalPrice = 0;
                     Dishes = "";
-                    sendMsg(message,"\nВведите номер телефона, чтобы курьер смог связаться с вами и адрес");
+                    sendMsg(message, "\nВведите номер телефона, чтобы курьер смог связаться с вами");
 
 
 //
                 } else {
                     sendMsg(message, "Закажите что-нибудь.Надо поесть");
                 }
+            }
+            if(TotalDish!=null)
+                userPhone = ph.getPhoneNumb(message);
+                if (message.getText().equals(userPhone)) {
+                    sendMsg(message, "Введите адрес, чтобы курьер знал куда ехать ");
+                }
 
-            }
-           userPhone= getPhoneNumb(message);
-            System.out.print(userPhone);
-            if (message.getText().equals(userPhone)) {
-                sendMsg(message, "SHAAAAAAA");
-            }
+
 
 
             try {
