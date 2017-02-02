@@ -1,9 +1,15 @@
 package sd;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.maps.GeoApiContext;
+import com.google.maps.GeocodingApi;
+import com.google.maps.model.GeocodingResult;
+import jersey.repackaged.com.google.common.collect.Maps;
+import org.json.JSONObject;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.TelegramBotsApi;
@@ -28,7 +34,10 @@ public class SimpleBot extends TelegramLongPollingBot {
     int TotalPrice;
     String userPhone;
     String TotalDish;
-       //ТЕСТ ПЕРЕМЕННЫЕ
+    GeoApiContext context;
+    String address;
+
+    //ТЕСТ ПЕРЕМЕННЫЕ
 
 
     public static void main(String[] args) throws IOException {
@@ -39,7 +48,7 @@ public class SimpleBot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
-            }
+    }
 
     @Override
     public String getBotUsername() {
@@ -56,9 +65,9 @@ public class SimpleBot extends TelegramLongPollingBot {
         Pattern p = Pattern.compile("firstName='[^0-9]+'+,+.l");
         Matcher m = p.matcher(message1);
         if (m.find()) {
-            user_name = message1.substring(m.start()+11,m.end()-4);
+            user_name = message1.substring(m.start() + 11, m.end() - 4);
         }
-            }
+    }
 
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
@@ -68,14 +77,16 @@ public class SimpleBot extends TelegramLongPollingBot {
         SuperKeyWord keyw = new SuperKeyWord();
         Dish td = new Dish();
         GetPhoneNumber ph = new GetPhoneNumber();
+        JsonR jsonR = new JsonR();
+
         if (message != null && message.hasText() && message.getText().contains("/")) {
             switch (cmd) {
                 case "/help":
                     sendMsg(message, "Cписок команд:  \n\n" +
-                            "/top5 - выводит топ 102000000 блюд"+
-                            "\n/help - выводит список команд"+
-                            "\n/favlist - бла бла бла \n\n"+
-                            "\t Описание работы с ботом \n\n"+
+                            "/top5 - выводит топ 102000000 блюд" +
+                            "\n/help - выводит список команд" +
+                            "\n/favlist - бла бла бла \n\n" +
+                            "\t Описание работы с ботом \n\n" +
                             "Для начала заказа введите ключевые слова или названия блюд." +
                             "\nДля того чтобы заверишь заказ введите STOP.\nЧтобы убрать блюдо из общей корзины");
                     break;
@@ -86,10 +97,10 @@ public class SimpleBot extends TelegramLongPollingBot {
                     hello(message);
                     sendMsg(message, "Привет," + user_name);
                     sendMsg(message, "Cписок команд:  \n\n" +
-                            "/top5 - выводит топ 102000000 блюд"+
-                            "\n/help - выводит список команд"+
-                            "\n/favlist - бла бла бла \n\n"+
-                            "\t Описание работы с ботом \n\n"+
+                            "/top5 - выводит топ 102000000 блюд" +
+                            "\n/help - выводит список команд" +
+                            "\n/favlist - бла бла бла \n\n" +
+                            "\t Описание работы с ботом \n\n" +
                             "Для начала заказа введите ключевые слова или названия блюд." +
                             "\nДля того чтобы заверишь заказ введите STOP.\nЧтобы убрать блюдо из общей корзины");
                     break;
@@ -118,13 +129,13 @@ public class SimpleBot extends TelegramLongPollingBot {
             // УДАЛЕНИЕ БЛЮДА ИЗ ОБЩЕГО СПИСКА
             for (i = 0; i < DishName.length; i++) {
                 if ((Dishes.contains(DishName[i])) & (message.getText().equals("Я не хочу " + DishName[i]))) {
-                    String kol=message.getText().replace("Я не хочу ","");
+                    String kol = message.getText().replace("Я не хочу ", "");
 
                     String reworkprice = "SELECT price FROM `dish` WHERE dish_name ='" + DishName[i] + "'";
                     try {
                         BD.rs = BD.stmt.executeQuery(reworkprice);
                         while (BD.rs.next()) {
-                            Dishes = Dishes.replaceFirst(kol,"");
+                            Dishes = Dishes.replaceFirst(kol, "");
                             TotalPrice = TotalPrice - BD.rs.getInt(1);
                             sendMsg(message, "Ваш заказ : " + Dishes + " " + "на сумму" + TotalPrice + " rub");
                         }
@@ -134,9 +145,7 @@ public class SimpleBot extends TelegramLongPollingBot {
 
                 }
             }
-        }
-
-        else {
+        } else {
             for (i = 0; i < DishName.length; i++) {
                 if ((message.getText().contains(DishName[i]))) {
                     takefoodforname = "SELECT * FROM `dish` WHERE dish_name ='" + DishName[i] + "'";
@@ -145,7 +154,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                         while (BD.rs.next()) {
                             sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n" + "Описание : " + BD.rs.getString(4) + "\n" + "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Фото : " + BD.rs.getString(3));
                             Dishes = BD.rs.getString(2) + " | " + Dishes;
-                            TotalDish= Dishes;
+                            TotalDish = Dishes;
                             TotalPrice = BD.rs.getInt(5) + TotalPrice;
                         }
                     } catch (SQLException e) {
@@ -153,7 +162,6 @@ public class SimpleBot extends TelegramLongPollingBot {
                     }
                     sendMsg(message, "Итоговая стоимость = " + TotalPrice + " rub");// отсюда и пляши, дядя
                     sendMsg(message, "Итоговый заказ : " + Dishes);
-
 
 
                     a = true;
@@ -167,20 +175,26 @@ public class SimpleBot extends TelegramLongPollingBot {
                     Dishes = "";
                     sendMsg(message, "\nВведите номер телефона, чтобы курьер смог связаться с вами");
 
-
-//
                 } else {
                     sendMsg(message, "Закажите что-нибудь.Надо поесть");
                 }
             }
-            if(TotalDish!=null)
+
+            if (TotalDish != null) {
                 userPhone = ph.getPhoneNumb(message);
                 if (message.getText().equals(userPhone)) {
                     sendMsg(message, "Введите адрес, чтобы курьер знал куда ехать ");
+
                 }
 
+                 if(message.getText().matches("[0-9]{0,4}[^0-9]{0,2}[а-я].+[0-9]{0,4}")) {
+                    context = new GeoApiContext().setApiKey("AIzaSyAg5cKfRFcLIxAUuPSs8IFXX5dnbH844uw");
+                    address = jsonR.URLmaker(message);
+                   sendMsg(message,address);
+                 }
 
 
+            }
 
             try {
                 log.log(message);
@@ -211,19 +225,17 @@ public class SimpleBot extends TelegramLongPollingBot {
     }
 
 
-
-    private  void sendMsg(Message message, String text) {
-            SendMessage sendMessage = new SendMessage();
-            sendMessage.enableMarkdown(false);
-            sendMessage.setChatId(message.getChatId().toString());
-            //sendMessage.setReplyToMessageId(message.getMessageId()); // Пересылка сообщений
-            sendMessage.setText(text);
-            try {
-                sendMessage(sendMessage);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
+    private void sendMsg(Message message, String text) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.enableMarkdown(false);
+        sendMessage.setChatId(message.getChatId().toString());
+        sendMessage.setText(text);
+        try {
+            sendMessage(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
+    }
 }
 
 

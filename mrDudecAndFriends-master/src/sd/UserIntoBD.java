@@ -13,6 +13,7 @@ public class UserIntoBD extends BD{
     String user_name;
     String user_secname;
     String user_id;
+    String queryUser;
 
     public void usrintbd(Message message) throws SQLException {
         BDsher();
@@ -20,7 +21,7 @@ public class UserIntoBD extends BD{
         findUserId(fullmsg);
         findUserName(fullmsg);
         findUserSecName(fullmsg);
-        String queryUser = "INSERT IGNORE INTO user " +
+        queryUser = "INSERT IGNORE INTO user " +
                 "SET" +
                 " id = '"+user_id+"'," +
                 "first_name = '"+user_name+"'," +
@@ -35,7 +36,6 @@ public class UserIntoBD extends BD{
     public void findUserId(String fullmsg) {
          Pattern p = Pattern.compile("id=[0-9]+,");
          Matcher m = p.matcher(fullmsg);
-
          if (m.find()) {
              user_id = fullmsg.substring(m.start() + 3, m.end() - 1);
     }
@@ -44,7 +44,6 @@ public class UserIntoBD extends BD{
     public void findUserName(String fullmsg) {
         Pattern p = Pattern.compile("firstName='[^0-9]+'+,+.l");
         Matcher m = p.matcher(fullmsg);
-
         if (m.find()) {
           user_name = fullmsg.substring(m.start()+11,m.end()-4);
         }

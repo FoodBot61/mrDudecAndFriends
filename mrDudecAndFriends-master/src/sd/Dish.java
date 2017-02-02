@@ -11,15 +11,16 @@ import java.util.List;
  */
 public class Dish {
     String [] test_dishh;
-    List rowValues1 = new ArrayList();
-public String [] TestDish() throws SQLException {
-    String sql1 = "SELECT dish_name FROM `dish` WHERE 1";
-    BD.rs = BD.stmt.executeQuery(sql1);
-    while (BD.rs.next()) {
-        rowValues1.add(BD.rs.getString(1));
-    }
-    test_dishh = (String[]) rowValues1.toArray(new String[rowValues1.size()]);
+    List rowValues = new ArrayList();
+    String ListofDish;
 
+public String [] TestDish() throws SQLException {
+    ListofDish = "SELECT dish_name FROM `dish` WHERE 1";
+    BD.rs = BD.stmt.executeQuery(ListofDish);
+    while (BD.rs.next()) {
+        rowValues.add(BD.rs.getString(1));
+    }
+    test_dishh = (String[]) rowValues.toArray(new String[rowValues.size()]);
     return test_dishh;
-}
+    }
 }

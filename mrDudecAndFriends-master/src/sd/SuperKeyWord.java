@@ -13,15 +13,13 @@ import java.util.List;
  * Created by user on 22.01.2017.
  */
 public class SuperKeyWord  {
-
     String[] Dishes;
     String Dish;
     String[] Keywords;
     String Keyword;
-    int i1;
     List rowValues = new ArrayList();
     List rowValues1 = new ArrayList();
-    String test_dish;
+
     public String[] findShaurma(Message message) throws SQLException,NullPointerException{
         String sql1="SELECT word FROM ` key_words` WHERE 1";
         BD.rs= BD.stmt.executeQuery(sql1);
@@ -41,18 +39,13 @@ public class SuperKeyWord  {
                 // You can then put this back into an array if necessary
                 Dishes = (String[]) rowValues.toArray(new String[rowValues.size()]);
             }
-
-
         }
-            for (int i1 = 0; i1 < rowValues.size(); i1++) {
+        for (int i1 = 0; i1 < rowValues.size(); i1++) {
                 Dish = Dishes[i1];
-
             }
         for (int i = 0; i < Dishes.length; i++) {
-
             System.out.println (Dishes[i]);//БЛЮДА ПО КЛЮЧЕВЫМ СЛОВАМ(sup)
         }
-
         return Dishes;
     }
 }

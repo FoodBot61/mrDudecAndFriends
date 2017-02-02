@@ -9,10 +9,9 @@ import java.util.regex.Pattern;
  * Created by user on 31.01.2017.
  */
 public class GetPhoneNumber {
-
-
 String msgText;
 String phone;
+
     public String getPhoneNumb(Message message)
     {
         msgText=message.getText();
@@ -24,6 +23,5 @@ String phone;
             System.out.print(phone);
         }
         return phone;
-
     }
 }

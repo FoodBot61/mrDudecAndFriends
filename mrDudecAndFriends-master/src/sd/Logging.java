@@ -27,7 +27,7 @@ public class Logging extends SimpleBot {
     String LastName;
     String takefoodforname;
     Dish td;
-    int amount;
+    String logvalues;
 
     public void log(Message message) throws SQLException {
         String fullmsg = message.toString();
@@ -53,22 +53,26 @@ public class Logging extends SimpleBot {
         while (BD.rs.next()) {
             user_secname = BD.rs.getString(1);
         }
+
         try {
             DishName = td.TestDish();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         for (i = 0; i < DishName.length; i++) {
             if ((message.getText().contains(DishName[i]))) {
                 takefoodforname = "SELECT * FROM `dish` WHERE dish_name ='" + DishName[i] + "'";
                 BD.rs = BD.stmt.executeQuery(takefoodforname);
+
                 while (BD.rs.next()) {
                     dish = BD.rs.getString(2);
                     price = BD.rs.getInt(5);
                     idDish = BD.rs.getInt(1);
                 }
+
                 try {
-                    String sql = "INSERT INTO log " +
+                    logvalues = "INSERT INTO log " +
                             "SET" +
                             " user_id = '" + user_id + "'," +
                             " user_name = '" + user_name + "'," +
@@ -80,7 +84,7 @@ public class Logging extends SimpleBot {
                             " `id_res` = 1," +
                             " `adress` = '" + adress + "'," +
                             " `id_dish` = '" + idDish +   "' ";
-                        BD.stmt.executeUpdate(sql);
+                        BD.stmt.executeUpdate(logvalues);
                     } catch (SQLException sqlEx) {
                         sqlEx.printStackTrace();
                     }

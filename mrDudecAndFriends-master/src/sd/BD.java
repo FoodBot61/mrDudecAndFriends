@@ -12,8 +12,6 @@ public class BD {
     private static final String url = "jdbc:mysql://localhost/foodbot?characterEncoding=Cp1251";
     private static final String user = "root";
     private static final String password = "";
-
-    // JDBC variables for opening and managing connection
     private static Connection con;
     static Statement stmt;
     static ResultSet rs;
@@ -26,7 +24,6 @@ public class BD {
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("Cannot find the driver in the classpath!", e);
         }
-
         try {
             con = DriverManager.getConnection(url, user, password);
             if (con != null) {
@@ -34,9 +31,8 @@ public class BD {
             } else {
                 System.out.println("А нет!");
             }
-
         stmt = con.createStatement();
-        } catch (SQLException sqlEx) {
+             } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
         }
     }
