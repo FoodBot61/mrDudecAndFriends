@@ -28,15 +28,15 @@ public class SimpleBot extends TelegramLongPollingBot {
     int i;
     String Keywords[];
     String[] DishName;
-    String takefoodforname;
-    boolean a;
+    String DishQuery;
+    boolean forKeyWords;
     String Dishes = " ";
     int TotalPrice;
-    String userPhone;
     String TotalDish;
     GeoApiContext context;
     String address;
-
+    String userPhone;
+    String takePhone;
     //ТЕСТ ПЕРЕМЕННЫЕ
 
 
@@ -148,9 +148,9 @@ public class SimpleBot extends TelegramLongPollingBot {
         } else {
             for (i = 0; i < DishName.length; i++) {
                 if ((message.getText().contains(DishName[i]))) {
-                    takefoodforname = "SELECT * FROM `dish` WHERE dish_name ='" + DishName[i] + "'";
+                    DishQuery= "SELECT * FROM `dish` WHERE dish_name ='" + DishName[i] + "'";
                     try {
-                        BD.rs = BD.stmt.executeQuery(takefoodforname);
+                        BD.rs = BD.stmt.executeQuery(DishQuery);
                         while (BD.rs.next()) {
                             sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n" + "Описание : " + BD.rs.getString(4) + "\n" + "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Фото : " + BD.rs.getString(3));
                             Dishes = BD.rs.getString(2) + " | " + Dishes;
@@ -164,7 +164,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                     sendMsg(message, "Итоговый заказ : " + Dishes);
 
 
-                    a = true;
+                    forKeyWords = true;
 
                 }
             }
@@ -184,15 +184,22 @@ public class SimpleBot extends TelegramLongPollingBot {
                 userPhone = ph.getPhoneNumb(message);
                 if (message.getText().equals(userPhone)) {
                     sendMsg(message, "Введите адрес, чтобы курьер знал куда ехать ");
-
+                    takePhone = message.getText();
                 }
 
-                 if(message.getText().matches("[0-9]{0,4}[^0-9]{0,2}[а-я].+[0-9]{0,4}")) {
-                    context = new GeoApiContext().setApiKey("AIzaSyAg5cKfRFcLIxAUuPSs8IFXX5dnbH844uw");
-                    address = jsonR.URLmaker(message);
-                   sendMsg(message,address);
-                 }
-
+                    if ((takePhone!=null)&(message.getText().matches("[0-9]{0,4}[^0-9]{0,2}[а-я].+[0-9]{0,4}"))) {
+                        context = new GeoApiContext().setApiKey("AIzaSyAg5cKfRFcLIxAUuPSs8IFXX5dnbH844uw");
+                        address = jsonR.URLmaker(message);
+                        sendMsg(message, address);
+                    }
+                if(address!=null&&takePhone!=null)
+                {
+                    sendMsg(message,"Ваш телефон :"+takePhone+"\n"
+                            +"Ваш адрес :"+address+"\n"
+                            +"Если данные указаны верно, введите 'Да'\n"
+                            +"В случае ошибки введите 'Нет'");
+                }
+            }
 
             }
 
@@ -204,7 +211,7 @@ public class SimpleBot extends TelegramLongPollingBot {
             }
 
 
-            if (!a) {
+            if (!forKeyWords) {
                 try {
                     Keywords = keyw.findShaurma(message);
                     if (Keywords == null) {
@@ -220,9 +227,9 @@ public class SimpleBot extends TelegramLongPollingBot {
                     e.printStackTrace();
                 }
             }
-            a = false;
+            forKeyWords = false;
         }
-    }
+
 
 
     private void sendMsg(Message message, String text) {
