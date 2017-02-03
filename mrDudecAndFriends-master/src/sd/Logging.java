@@ -22,7 +22,6 @@ public class Logging extends SimpleBot {
     int date;
     String dish;
     String msgText;
-    String adress;
     String FirstName;
     String LastName;
     String takefoodforname;
@@ -33,7 +32,6 @@ public class Logging extends SimpleBot {
         String fullmsg = message.toString();
         //System.out.println(fullmsg); //Сводка по сообщению
         msgText = message.getText();
-        adress = "SELECT adress FROM user WHERE id=104730502";// АДРЕС CLIENT
         Pattern p = Pattern.compile("id=[0-9]+,");
         Matcher m = p.matcher(fullmsg);
         if (m.find()) {
@@ -82,7 +80,6 @@ public class Logging extends SimpleBot {
                             " `price` =  '" + price + "', " +
                             " `amount` = 1," +
                             " `id_res` = 1," +
-                            " `adress` = '" + adress + "'," +
                             " `id_dish` = '" + idDish +   "' ";
                         BD.stmt.executeUpdate(logvalues);
                     } catch (SQLException sqlEx) {
