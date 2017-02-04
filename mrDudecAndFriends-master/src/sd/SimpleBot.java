@@ -37,8 +37,9 @@ public class SimpleBot extends TelegramLongPollingBot {
     String address;
     String userPhone;
     String takePhone;
+    JsonR jsonR;
+    GetPhoneNumber ph;
     //ТЕСТ ПЕРЕМЕННЫЕ
-
 
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
@@ -60,6 +61,41 @@ public class SimpleBot extends TelegramLongPollingBot {
         return "316708819:AAEdaPqrGqRt7E7Kpg0oXosJrjcQyjm5FUY";
     }
 
+    private void sendMsg(Message message, String text) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.enableMarkdown(false);
+        sendMessage.setChatId(message.getChatId().toString());
+        sendMessage.setText(text);
+        try {
+            sendMessage(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getPhoneAndAddress(Message message) {
+
+        if (TotalDish != null) {
+            userPhone = ph.getPhoneNumb(message);
+            if (message.getText().equals(userPhone)) {
+                sendMsg(message, "Введите адрес, чтобы курьер знал куда ехать ");
+                takePhone = message.getText();
+            }
+
+
+            if ((takePhone != null) & (message.getText().matches("[0-9]{0,4}[^0-9]{0,2}[а-я].+[0-9]{1,4}"))) {
+                context = new GeoApiContext().setApiKey("AIzaSyAg5cKfRFcLIxAUuPSs8IFXX5dnbH844uw");
+                address = jsonR.URLmaker(message);
+                sendMsg(message, address);
+                sendMsg(message, "Ваш телефон :" + takePhone + "\n"
+                        + "Ваш адрес :" + address + "\n"
+                        + "Если данные указаны верно, введите 'Да'\n"
+                        + "В случае ошибки введите 'Нет'");
+            }
+
+        }
+    }
+
     public void hello(Message message) {
         String message1 = message.toString();
         Pattern p = Pattern.compile("firstName='[^0-9]+'+,+.l");
@@ -76,8 +112,8 @@ public class SimpleBot extends TelegramLongPollingBot {
         UserIntoBD us = new UserIntoBD();
         SuperKeyWord keyw = new SuperKeyWord();
         Dish td = new Dish();
-        GetPhoneNumber ph = new GetPhoneNumber();
-        JsonR jsonR = new JsonR();
+        ph = new GetPhoneNumber();
+        jsonR = new JsonR();
 
         if (message != null && message.hasText() && message.getText().contains("/")) {
             switch (cmd) {
@@ -148,7 +184,7 @@ public class SimpleBot extends TelegramLongPollingBot {
         } else {
             for (i = 0; i < DishName.length; i++) {
                 if ((message.getText().contains(DishName[i]))) {
-                    DishQuery= "SELECT * FROM `dish` WHERE dish_name ='" + DishName[i] + "'";
+                    DishQuery = "SELECT * FROM `dish` WHERE dish_name ='" + DishName[i] + "'";
                     try {
                         BD.rs = BD.stmt.executeQuery(DishQuery);
                         while (BD.rs.next()) {
@@ -168,48 +204,46 @@ public class SimpleBot extends TelegramLongPollingBot {
 
                 }
             }
+        }
             if (message.getText().equals("STOP")) {
                 if (Dishes != null && TotalPrice != 0) {
                     sendMsg(message, "Ваш заказ : " + Dishes + " " + "на сумму" + TotalPrice + " rub");
                     TotalPrice = 0;
                     Dishes = "";
-                    sendMsg(message, "\nВведите номер телефона, чтобы курьер смог связаться с вами");
-
+                    sendMsg(message, "Введите номер телефона, чтобы курьер смог связаться с вами");
                 } else {
                     sendMsg(message, "Закажите что-нибудь.Надо поесть");
                 }
             }
 
-            if (TotalDish != null) {
-                userPhone = ph.getPhoneNumb(message);
-                if (message.getText().equals(userPhone)) {
-                    sendMsg(message, "Введите адрес, чтобы курьер знал куда ехать ");
-                    takePhone = message.getText();
-                }
+        getPhoneAndAddress(message);
 
-                    if ((takePhone!=null)&(message.getText().matches("[0-9]{0,4}[^0-9]{0,2}[а-я].+[0-9]{0,4}"))) {
-                        context = new GeoApiContext().setApiKey("AIzaSyAg5cKfRFcLIxAUuPSs8IFXX5dnbH844uw");
-                        address = jsonR.URLmaker(message);
-                        sendMsg(message, address);
-                    }
-                if(address!=null&&takePhone!=null)
+
+            if ((takePhone!=null)&&(address!=null)){
+            String gol = message.getText();
+                switch (gol)
                 {
-                    sendMsg(message,"Ваш телефон :"+takePhone+"\n"
-                            +"Ваш адрес :"+address+"\n"
-                            +"Если данные указаны верно, введите 'Да'\n"
-                            +"В случае ошибки введите 'Нет'");
+                    case "Да" :
+                        sendMsg(message, "Все нормально");
+                        takePhone = null;
+                        break;
+
+                    case "Нет" :
+                        sendMsg(message, "????????");
+                        sendMsg(message,"\nВведите данные повторно");
+                        getPhoneAndAddress(message);
+                        break;
+
                 }
             }
 
-            }
 
-            try {
+        try {
                 log.log(message);
 
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
 
             if (!forKeyWords) {
                 try {
@@ -230,19 +264,6 @@ public class SimpleBot extends TelegramLongPollingBot {
             forKeyWords = false;
         }
 
-
-
-    private void sendMsg(Message message, String text) {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.enableMarkdown(false);
-        sendMessage.setChatId(message.getChatId().toString());
-        sendMessage.setText(text);
-        try {
-            sendMessage(sendMessage);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-    }
 }
 
 
