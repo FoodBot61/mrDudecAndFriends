@@ -51,6 +51,8 @@ public class SimpleBot extends TelegramLongPollingBot {
         }
     }
 
+
+
     @Override
     public String getBotUsername() {
         return "FoodBot";
@@ -114,7 +116,6 @@ public class SimpleBot extends TelegramLongPollingBot {
         Dish td = new Dish();
         ph = new GetPhoneNumber();
         jsonR = new JsonR();
-
         if (message != null && message.hasText() && message.getText().contains("/")) {
             switch (cmd) {
                 case "/help":
@@ -226,6 +227,16 @@ public class SimpleBot extends TelegramLongPollingBot {
                     case "Да" :
                         sendMsg(message, "Все нормально");
                         takePhone = null;
+                        try {
+
+                            String whatafa = jsonR.DistanseBe(address);
+                            sendMsg(message,"Ближайщий ресторан к вам находится на "+whatafa.replace("_"," ").replace(".","")+
+                                    "\nПримерное время доставки "+whatafa.replaceAll("[A-я]",""));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
                         break;
 
                     case "Нет" :
