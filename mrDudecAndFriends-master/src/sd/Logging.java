@@ -53,7 +53,7 @@ public class Logging extends SimpleBot {
         }
 
         try {
-            DishName = td.TestDish();
+            DishName = td.findDish();
         } catch (SQLException e) {
             e.printStackTrace();
         }

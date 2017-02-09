@@ -20,7 +20,7 @@ public class SuperKeyWord  {
     List rowValues = new ArrayList();
     List rowValues1 = new ArrayList();
 
-    public String[] findShaurma(Message message) throws SQLException,NullPointerException{
+    public String[] findDishKW(Message message) throws SQLException,NullPointerException{
         String sql1="SELECT word FROM ` key_words` WHERE 1";
         BD.rs= BD.stmt.executeQuery(sql1);
         while (BD.rs.next()) {
