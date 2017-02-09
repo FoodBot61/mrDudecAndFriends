@@ -218,50 +218,38 @@ public class SimpleBot extends TelegramLongPollingBot {
             }
 
         getPhoneAndAddress(message);
-
-
             if ((takePhone!=null)&&(address!=null)){
             String gol = message.getText();
                 switch (gol)
                 {
                     case "Да" :
-                        sendMsg(message, "Все нормально");
                         takePhone = null;
                         try {
-
                             String whatafa = jsonR.DistanseBe(address);
-                            sendMsg(message,"Ближайщий ресторан к вам находится на "+whatafa.replace("_"," ").replace(".","")+
-                                    "\nПримерное время доставки "+whatafa.replaceAll("[A-я]",""));
+                            sendMsg(message,whatafa);
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
                         break;
-
                     case "Нет" :
-                        sendMsg(message, "????????");
                         sendMsg(message,"\nВведите данные повторно");
                         getPhoneAndAddress(message);
                         break;
-
                 }
             }
-
-
         try {
                 log.log(message);
 
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
             if (!forKeyWords) {
                 try {
                     Keywords = keyw.findShaurma(message);
                     if (Keywords == null) {
                         sendMsg(message, "Ну что ты,бабуин введи что нибудь нормальное");
-
                     } else {
                         for (i = 0; i < Keywords.length; i++) {
                             sendMsg(message, (i + 1 + " " + Keywords[i]));
@@ -274,7 +262,6 @@ public class SimpleBot extends TelegramLongPollingBot {
             }
             forKeyWords = false;
         }
-
 }
 
 

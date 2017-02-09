@@ -98,9 +98,9 @@ public class JsonR {
         }
         while (BD.rs.next()) {
             RestAddress = BD.rs.getString(1).replace(" ", "_").replace(",", "_");
-            String url = new String("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + address.replace(" ", "_").replace(",", "_") + "&destinations=" + RestAddress) + encode(params);
+            String url = new String("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + address.replace(" ","_").replace(",", "_") + "&destinations=" + RestAddress) + encode(params);
             final JSONObject response = JsonR.read(url);
-            String timebetween2loc = response.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject("duration").getString("text").replace("mins", "").trim();
+            String timebetween2loc = response.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject("duration").getString("text").replace("mins", "").replace("min", "").trim();
             double TimetoRest = Double.parseDouble(timebetween2loc);
             Distance.put(RestAddress, TimetoRest);
         }
@@ -113,10 +113,14 @@ public class JsonR {
         }
         Object KeytoRest= MinDistance;
         for (Map.Entry<String, Double> pair : entrySet) {
+            System.out.print(pair.toString());
             if (KeytoRest.equals(pair.getValue())) {
-                ClosestRest=pair.toString();
+                ClosestRest = pair.toString();
+
             }
         }
+        ClosestRest ="Ближайщий ресторан РИС к вам находится на "+ClosestRest.replace("_"," ").replace(".","").replaceAll("=.+[0-9]{1}$","")+
+                "\nПримерное время доставки : "+ClosestRest.replaceAll(".[А-я].+.[0-9].+=","").replaceAll(".[0-9]{1}$","")+" мин";
             return ClosestRest;
         }
     }
