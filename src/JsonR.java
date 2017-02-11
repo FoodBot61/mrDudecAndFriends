@@ -143,6 +143,13 @@ public class JsonR {
             while (BD.rs.next()) {
                 useridformbd = BD.rs.getString(1);
             }
+            String IdResQuery="SELECT id_res FROM resbuild WHERE address='"+UserId+"'";
+            BD.rs=BD.stmt.executeQuery(IdResQuery);
+            while (BD.rs.next())
+            {
+                String testtask=BD.rs.getString(1);
+                System.out.print("\nid resitka" +testtask);
+            }
          return    useridformbd;
         }
     }
