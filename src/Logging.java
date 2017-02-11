@@ -1,6 +1,8 @@
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.*;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.User;
@@ -28,7 +30,10 @@ public class Logging extends SimpleBot {
     Dish td;
     String logvalues;
 
-    public void log(Message message) throws SQLException {
+    //testvar
+   List<String> ca;
+    public List<String> log(Message message) throws SQLException {
+
         String fullmsg = message.toString();
         //System.out.println(fullmsg); //Сводка по сообщению
         msgText = message.getText();
@@ -57,6 +62,7 @@ public class Logging extends SimpleBot {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+ca=new ArrayList<String>();
 
         for (i = 0; i < DishName.length; i++) {
             if ((message.getText().contains(DishName[i]))) {
@@ -67,26 +73,17 @@ public class Logging extends SimpleBot {
                     dish = BD.rs.getString(2);
                     price = BD.rs.getInt(5);
                     idDish = BD.rs.getInt(1);
-                }
 
-                try {
-                    logvalues = "INSERT INTO log " +
-                            "SET" +
-                            " user_id = '" + user_id + "'," +
-                            " user_name = '" + user_name + "'," +
-                            " user_secname = '" + user_secname + "', " +
-                            " `dish` = '" + dish + "'," +
-                            " `date_msg` = '" + String.valueOf(date) + "'," +
-                            " `price` =  '" + price + "', " +
-                            " `id_res` = 1," +
-                            " `id_dish` = '" + idDish +   "' ";
-                        BD.stmt.executeUpdate(logvalues);
-                    } catch (SQLException sqlEx) {
-                        sqlEx.printStackTrace();
-                    }
+                        ca.add(0,dish);
+                      //  System.out.print(ca.get(0));
+
                 }
+                System.out.print("test"+ca.get(0));
             }
         }
+
+return ca;
+    }
     }
 
 

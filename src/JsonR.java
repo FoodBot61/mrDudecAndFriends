@@ -148,7 +148,6 @@ public class JsonR {
             while (BD.rs.next())
             {
                 String testtask=BD.rs.getString(1);
-                System.out.print("\nid resitka" +testtask);
             }
          return    useridformbd;
         }

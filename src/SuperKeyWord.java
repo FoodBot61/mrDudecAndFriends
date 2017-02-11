@@ -16,30 +16,42 @@ public class SuperKeyWord  {
     String Dish;
     String[] Keywords;
     String Keyword;
-    List rowValues = new ArrayList();
-    List rowValues1 = new ArrayList();
-
+    List ListofDish = new ArrayList();
+    List ListofKeywords = new ArrayList();
+    List ListofDishforException = new ArrayList();
+    String DishQuery;
+    String Dishes1[];
     public String[] findDishKW(Message message) throws SQLException,NullPointerException{
         String sql1="SELECT word FROM ` key_words` WHERE 1";
         BD.rs= BD.stmt.executeQuery(sql1);
         while (BD.rs.next()) {
-            rowValues1.add(BD.rs.getString(1));
+            ListofKeywords.add(BD.rs.getString(1));
         }
-        Keywords = (String[]) rowValues1.toArray(new String[rowValues.size()]);
-        for (int i = 0; i < rowValues1.size(); i++) {
+        DishQuery= "SELECT dish_name FROM `dish` WHERE 1";
+        BD.rs = BD.stmt.executeQuery(DishQuery);
+        while (BD.rs.next()) {
+            ListofDishforException.add(BD.rs.getString(1));
+        }
+        Dishes1=(String[]) ListofDishforException.toArray(new String[ListofDish.size()]);
+        Keywords = (String[])  ListofKeywords.toArray(new String[ListofDish.size()]);
+        for (int i = 0; i <  ListofKeywords.size(); i++) {
             Keyword = Keywords[i];//КЛЮЧЕВЫЕ СЛОВА
+            Dish = Dishes1[i];
             String msgText = message.getText();
-            if ((msgText.toLowerCase().contains(Keyword)&&(msgText.contains("Я не хочу "))==false)) {  //СООБЩЕНИЕ СОДЕРЖИТ ИЛИ РАВНО КЛЮЧУ
+            if ((msgText.replace(msgText.charAt(0),String.valueOf(msgText.charAt(0)).toLowerCase().charAt(0)).contains(Keyword)
+                    &&(msgText.contains("Я не хочу "))==false)
+                    &&(msgText.contains(Dishes1[i])==false))
+            {
                 String sql = "SELECT dish_name FROM ` key_words`,`dish` WHERE dish.id_keyword=` key_words`.`id` and word='" + Keyword + "'";// АДРЕС CLIENT
                 BD.rs = BD.stmt.executeQuery(sql);
                 while (BD.rs.next()) {
-                    rowValues.add(BD.rs.getString(1));
+                    ListofDish.add(BD.rs.getString(1));
                 }
-                // You can then put this back into an array if necessary
-                Dishes = (String[]) rowValues.toArray(new String[rowValues.size()]);
+
+                Dishes = (String[]) ListofDish.toArray(new String[ListofDish.size()]);
             }
         }
-        for (int i1 = 0; i1 < rowValues.size(); i1++) {
+        for (int i1 = 0; i1 < ListofDish.size(); i1++) {
                 Dish = Dishes[i1];
             }
         for (int i = 0; i < Dishes.length; i++) {

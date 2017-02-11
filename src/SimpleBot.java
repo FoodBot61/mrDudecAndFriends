@@ -1,6 +1,7 @@
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,6 +44,12 @@ public class SimpleBot extends TelegramLongPollingBot {
     GetPhoneNumber ph;
     String userId;
     //ТЕСТ ПЕРЕМЕННЫЕ
+
+    String dish;
+    int idDish;
+    int price;
+
+String elf;
 
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
@@ -218,10 +225,6 @@ public class SimpleBot extends TelegramLongPollingBot {
                     sendMsg(message, "Итоговая стоимость = " + TotalPrice + " rub");// отсюда и пляши, дядя
                     sendMsg(message, "Итоговый заказ : " + Dishes);
 
-
-                    forKeyWords = true;
-
-                }
             }
         }
             if (message.getText().equals("STOP")) {
@@ -255,7 +258,30 @@ public class SimpleBot extends TelegramLongPollingBot {
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
+                        /////////////////////////////////////////////
+                        for(i=0;i<DishName.length; i++)
+                        {
+                            if(TotalDish.contains(DishName[i]))
+                            {
+                                System.out.print("\n"+DishName[i]);
+                            }
 
+                        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        ////////////////////////////////////////////////////
                         sendMsgToRest(message,"Адрес клиента: "+address+
                                             "\nТелефон клиента: "+Phone+
                                                   "\nЗаказ: "+TotalDish+
@@ -270,12 +296,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                         break;
                 }
             }
-        try {
-                log.log(message);
 
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
             if (!forKeyWords) {
                 try {
                     Keywords = keyw.findDishKW(message);
@@ -293,8 +314,8 @@ public class SimpleBot extends TelegramLongPollingBot {
             }
             forKeyWords = false;
         }
-}
-
+        }
+    }
 
 
 
