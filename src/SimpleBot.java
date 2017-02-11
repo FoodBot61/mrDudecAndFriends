@@ -45,9 +45,7 @@ public class SimpleBot extends TelegramLongPollingBot {
     String userId;
     //ТЕСТ ПЕРЕМЕННЫЕ
 
-    String dish;
-    int idDish;
-    int price;
+
 
 String elf;
 
@@ -297,11 +295,11 @@ String elf;
                 }
             }
 
-            if (!forKeyWords) {
+            if (!forKeyWords){
                 try {
                     Keywords = keyw.findDishKW(message);
                     if (Keywords == null) {
-                        sendMsg(message, "Ну что ты,бабуин введи что нибудь нормальное");
+
                     } else {
                         for (i = 0; i < Keywords.length; i++) {
                             sendMsg(message, (i + 1 + " " + Keywords[i]));
