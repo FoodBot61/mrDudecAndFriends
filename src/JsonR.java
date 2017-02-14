@@ -21,21 +21,24 @@ import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by user on 02.02.2017.
  */
 public class JsonR {
-    String address;
+    String ClientAddress;
     String RestAddress;
     double MinDistance;
     final Map<String, String> params = Maps.newHashMap();
     HashMap<String, Double> Distance = new HashMap<>();
     Set<Map.Entry<String, Double>> entrySet = Distance.entrySet();
     String ClosestRest;
-    String UserId;
+    String AdressClosestRest;
     String useridformbd;
     String IdRest;
+    String user_id;
 
     private static String ReadAll(final Reader rd) throws IOException {
         final StringBuilder sb = new StringBuilder();
@@ -86,14 +89,14 @@ public class JsonR {
         try {
             final JSONObject response = JsonR.read(url);
             JSONObject location = response.getJSONArray("results").getJSONObject(0);
-            address = location.getString("formatted_address");
+            ClientAddress = location.getString("formatted_address");
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return address;
+        return ClientAddress;
     }
 
-    public String DistanseBe(String address) throws IOException, SQLException {
+    public String DistanseBe(String ClientAddress) throws IOException, SQLException {
         String addressQuery = "SELECT address FROM resbuild";
         try {
             BD.rs = BD.stmt.executeQuery(addressQuery);
@@ -102,7 +105,7 @@ public class JsonR {
         }
         while (BD.rs.next()) {
             RestAddress = BD.rs.getString(1).replace(" ", "_").replace(",", "_");
-            String url = new String("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + address.replace(" ","_").replace(",", "_") + "&destinations=" + RestAddress) + encode(params);
+            String url = new String("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + ClientAddress.replace(" ","_").replace(",", "_") + "&destinations=" + RestAddress) + encode(params);
             final JSONObject response = JsonR.read(url);
             String timebetween2loc = response.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject("duration").getString("text").replace("mins", "").replace("min", "").trim();
             double TimetoRest = Double.parseDouble(timebetween2loc);
@@ -123,8 +126,7 @@ public class JsonR {
 
             }
         }
-
-        UserId=ClosestRest.replaceAll("=.[0-9]+\\.+[0-9]","").replaceFirst("_"," ").replace(".__","., ");
+        AdressClosestRest=ClosestRest.replaceAll("=.[0-9]+\\.+[0-9]","").replaceFirst("_"," ").replace(".__","., ");
         ClosestRest ="Ближайщий ресторан РИС к вам находится на "+ClosestRest.replace("_"," ").replace(".","").replaceAll("=.+[0-9]{1}$","")+
                 "\nПримерное время доставки : "+ClosestRest.replaceAll(".[А-я].+.[0-9].+=","").replaceAll(".[0-9]{1}$","")+" мин";
 
@@ -135,7 +137,7 @@ public class JsonR {
         }
 
         public String takeUserId() throws SQLException {
-            String UserIdQuery="SELECT user_id FROM resbuild WHERE address='" + UserId + "'";
+            String UserIdQuery="SELECT user_id FROM resbuild WHERE address='" + AdressClosestRest + "'";
             BD.rs=BD.stmt.executeQuery(UserIdQuery);
             while (BD.rs.next()) {
                 useridformbd = BD.rs.getString(1);
@@ -144,13 +146,22 @@ public class JsonR {
         }
         public String takeIdRest() throws SQLException
     {
-        String IdResQuery="SELECT id_res FROM resbuild WHERE address='"+UserId+"'";
+        String IdResQuery="SELECT id_res FROM resbuild WHERE address='"+AdressClosestRest+"'";
         BD.rs=BD.stmt.executeQuery(IdResQuery);
         while (BD.rs.next())
         {
             IdRest=BD.rs.getString(1);
         }
         return IdRest;
+    }
+        public String UserIdFromMessage(Message message){
+        String fullmsg = message.toString();
+        Pattern p = Pattern.compile("id=[0-9]+,");
+        Matcher m = p.matcher(fullmsg);
+        if (m.find()) {
+            user_id = fullmsg.substring(m.start() + 3, m.end() - 1);
+        }
+        return user_id;
     }
     }
 

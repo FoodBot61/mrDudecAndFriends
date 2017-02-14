@@ -43,7 +43,7 @@ public class SimpleBot extends TelegramLongPollingBot {
     int TotalPrice;
     JsonR jsonR;
     GetPhoneNumber ph;
-    String userId;
+    String userIdRest;
     String user_name;
     String user_secname;
     String user_id;
@@ -91,7 +91,7 @@ public class SimpleBot extends TelegramLongPollingBot {
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(false);
-        sendMessage.setChatId(userId);
+        sendMessage.setChatId(userIdRest);
         sendMessage.setText(text);
         try {
             sendMessage(sendMessage);
@@ -140,11 +140,16 @@ public class SimpleBot extends TelegramLongPollingBot {
         Dish td = new Dish();
         ph = new GetPhoneNumber();
         jsonR = new JsonR();
+        try {
+            us.usrintbd(message);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         if (message != null && message.hasText() && message.getText().contains("/")) {
             switch (cmd) {
                 case "/help":
                     sendMsg(message, "Cписок команд:  \n\n" +
-                            "/top5 - выводит топ 102000000 блюд" +
+                            "/top5 - выводит топ 5 блюд, которые вы заказывали " +
                             "\n/help - выводит список команд" +
                             "\n/favlist - бла бла бла \n\n" +
                             "\t Описание работы с ботом \n\n" +
@@ -152,7 +157,23 @@ public class SimpleBot extends TelegramLongPollingBot {
                             "\nДля того чтобы заверишь заказ введите STOP.\nЧтобы убрать блюдо из общей корзины");
                     break;
                 case "/top5":
-                    sendMsg(message, "gjkndgnuidfvdsvsdvsdvsdvsdvsd");
+                    user_id = jsonR.UserIdFromMessage(message);
+                    String top5Query="SELECT dish FROM `log` WHERE user_id='"+user_id+"' GROUP BY id_dish ORDER BY COUNT(*) DESC LIMIT 5";
+                    try {
+                        BD.rs=BD.stmt.executeQuery(top5Query);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        while (BD.rs.next())
+                        {
+                            sendMsg(message,"TOP 5 Ваших заказанных блюд\n"+
+                                    BD.rs.getString(1)+"\n");
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
                     break;
                 case "/start":
                     hello(message);
@@ -175,11 +196,6 @@ public class SimpleBot extends TelegramLongPollingBot {
         if (message.getText().equalsIgnoreCase("привет")) {
             sendMsg(message, "Привет, проголодался?");
             sendMsg(message, "http://minionomaniya.ru/wp-content/uploads/2016/01/%D0%9A%D0%B5%D0%B2%D0%B8%D0%BD.jpg");
-        }
-        try {
-            us.usrintbd(message);
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         try {
             DishName = td.findDish();
@@ -246,12 +262,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                 switch (gol) {
                     case "Да":
                         takePhone = null;
-                        String fullmsg = message.toString();
-                        Pattern p = Pattern.compile("id=[0-9]+,");
-                        Matcher m = p.matcher(fullmsg);
-                        if (m.find()) {
-                            user_id = fullmsg.substring(m.start() + 3, m.end() - 1);
-                        }
+                        user_id = jsonR.UserIdFromMessage(message);
                         date = message.getDate();
                         String LastName = "SELECT last_name FROM user WHERE id='" + user_id + "'";
                         try {
@@ -275,7 +286,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                             e.printStackTrace();
                         }
                         try {
-                            userId = jsonR.takeUserId();
+                            userIdRest = jsonR.takeUserId();
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
@@ -285,10 +296,10 @@ public class SimpleBot extends TelegramLongPollingBot {
                         for (int k = 0; k < boom.length - 1; k++) {
                             dish = boom[k].replaceAll("price=+[0-9]+.*","");
                             price = Integer.valueOf(boom[k].replaceAll("[^0-9]+price=","").replaceAll("id=+.+",""));
-                          idDish=Integer.valueOf(boom[k].replaceAll("[\\S\\s]+id=",""));
+                            idDish=Integer.valueOf(boom[k].replaceAll("[\\S\\s]+id=",""));
                             try {
                                 usirId = jsonR.takeIdRest();
-                            } catch (SQLException e) {
+                                } catch (SQLException e) {
                                 e.printStackTrace();
                             }
                             try {
@@ -306,15 +317,11 @@ public class SimpleBot extends TelegramLongPollingBot {
 
                                 BD.stmt.executeUpdate(logvalues);
 
-                            } catch (SQLException sqlEx) {
+                                } catch (SQLException sqlEx) {
                                 sqlEx.printStackTrace();
                             }
-
-
-                           System.out.print("\n" + boom[k]);
-
                         }
-TotalDishforLog="";
+                             TotalDishforLog="";
                         sendMsgToRest(message,"Адрес клиента: "+address+
                                             "\nТелефон клиента: "+Phone+
                                                   "\nЗаказ: "+TotalDish.replace("|"," ")+
@@ -331,9 +338,7 @@ TotalDishforLog="";
             if (!forKeyWords){
                 try {
                     Keywords = keyw.findDishKW(message);
-                    if (Keywords == null) {
-
-                    } else {
+                    if (Keywords != null) {
                         for (i = 0; i < Keywords.length; i++) {
                             sendMsg(message, (i + 1 + " " + Keywords[i]));
                         }
@@ -346,6 +351,7 @@ TotalDishforLog="";
             forKeyWords = false;
         }
         }
+
     }
 
 
