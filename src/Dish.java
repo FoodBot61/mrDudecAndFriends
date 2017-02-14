@@ -11,8 +11,7 @@ public class Dish {
     String [] ListofDishh;
     List rowValues = new ArrayList();
     String DishQuery;
-
-public String [] findDish() throws SQLException {
+    public String [] findDish() throws SQLException {
     DishQuery= "SELECT dish_name FROM `dish` WHERE 1";
     BD.rs = BD.stmt.executeQuery(DishQuery);
     while (BD.rs.next()) {

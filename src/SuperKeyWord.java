@@ -20,8 +20,6 @@ public class SuperKeyWord {
     List ListofKeywords = new ArrayList();
 
     public String[] findDishKW(Message message) throws SQLException, NullPointerException {
-
-
         String sql1 = "SELECT word FROM ` key_words` WHERE 1";
         BD.rs = BD.stmt.executeQuery(sql1);
         while (BD.rs.next()) {

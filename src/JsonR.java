@@ -33,10 +33,10 @@ public class JsonR {
     HashMap<String, Double> Distance = new HashMap<>();
     Set<Map.Entry<String, Double>> entrySet = Distance.entrySet();
     String ClosestRest;
-
-    //test var
     String UserId;
     String useridformbd;
+    String IdRest;
+
     private static String ReadAll(final Reader rd) throws IOException {
         final StringBuilder sb = new StringBuilder();
         int cp;
@@ -135,22 +135,23 @@ public class JsonR {
         }
 
         public String takeUserId() throws SQLException {
-
-
-            System.out.print(UserId);
             String UserIdQuery="SELECT user_id FROM resbuild WHERE address='" + UserId + "'";
             BD.rs=BD.stmt.executeQuery(UserIdQuery);
             while (BD.rs.next()) {
                 useridformbd = BD.rs.getString(1);
             }
-            String IdResQuery="SELECT id_res FROM resbuild WHERE address='"+UserId+"'";
-            BD.rs=BD.stmt.executeQuery(IdResQuery);
-            while (BD.rs.next())
-            {
-                String testtask=BD.rs.getString(1);
-            }
          return    useridformbd;
         }
+        public String takeIdRest() throws SQLException
+    {
+        String IdResQuery="SELECT id_res FROM resbuild WHERE address='"+UserId+"'";
+        BD.rs=BD.stmt.executeQuery(IdResQuery);
+        while (BD.rs.next())
+        {
+            IdRest=BD.rs.getString(1);
+        }
+        return IdRest;
+    }
     }
 
 
