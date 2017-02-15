@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
@@ -54,7 +55,7 @@ public class SimpleBot extends TelegramLongPollingBot {
     String dish;
     String TotalDishforLog;
     //ТЕСТ ПЕРЕМЕННЫЕ
-
+    char even;
 
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
@@ -158,22 +159,34 @@ public class SimpleBot extends TelegramLongPollingBot {
                     break;
                 case "/top5":
                     user_id = jsonR.UserIdFromMessage(message);
-                    String top5Query="SELECT dish FROM `log` WHERE user_id='"+user_id+"' GROUP BY id_dish ORDER BY COUNT(*) DESC LIMIT 5";
+                    String top5Query="SELECT dish,COUNT(id_dish) FROM `log` WHERE user_id='"+user_id+"' GROUP BY id_dish ORDER BY COUNT(*) DESC LIMIT 5";
                     try {
                         BD.rs=BD.stmt.executeQuery(top5Query);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        while (BD.rs.next())
-                        {
-                            sendMsg(message,"TOP 5 Ваших заказанных блюд\n"+
-                                    BD.rs.getString(1)+"\n");
+                        if(BD.rs.next()==false) {
+                            sendMsg(message, "Вы не сделали ни одного заказа");
                         }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                        else{
+                            sendMsg(message,"TOP 5 Ваших заказанных блюд\n");
+                        while (BD.rs.next()) {
+                            for (i = 5; i < 21; i++) {
+                                    if ((BD.rs.getInt(2) == i) && (String.valueOf(BD.rs.getInt(2)).endsWith("1")) && (String.valueOf(BD.rs.getInt(2)).endsWith("6")) && (String.valueOf(BD.rs.getInt(2)).endsWith("7")) && (String.valueOf(BD.rs.getInt(2)).endsWith("8")) && (String.valueOf(BD.rs.getInt(2)).endsWith("9"))) {
+                                        even = ' ';
+                                    }
+                                }
+                                if (String.valueOf(BD.rs.getInt(2)).endsWith("2") || (String.valueOf(BD.rs.getInt(2)).endsWith("3") || (String.valueOf(BD.rs.getInt(2)).endsWith("4")))) {
+                                    even = 'a';
+                                }
+                                sendMsg(message, BD.rs.getString(1) + " закали  " + BD.rs.getInt(2) + " раз" + even + "\n");
+                            }
+                        }
 
+
+
+
+            } catch (SQLException e) {
+
+                e.printStackTrace();
+            }
                     break;
                 case "/start":
                     hello(message);
@@ -324,7 +337,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                              TotalDishforLog="";
                         sendMsgToRest(message,"Адрес клиента: "+address+
                                             "\nТелефон клиента: "+Phone+
-                                                  "\nЗаказ: "+TotalDish.replace("|"," ")+
+                                                  "\nЗаказ: "+TotalDish.replace("|",",")+
                                     "\nИтоговая стоимость: "+TotalPrice +" руб");
                         break;
 
