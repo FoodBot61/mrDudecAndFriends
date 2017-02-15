@@ -55,8 +55,6 @@ public class SimpleBot extends TelegramLongPollingBot {
     String dish;
     String TotalDishforLog;
     //ТЕСТ ПЕРЕМЕННЫЕ
-    char even;
-
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
@@ -161,29 +159,30 @@ public class SimpleBot extends TelegramLongPollingBot {
                     user_id = jsonR.UserIdFromMessage(message);
                     String top5Query="SELECT dish,COUNT(id_dish) FROM `log` WHERE user_id='"+user_id+"' GROUP BY id_dish ORDER BY COUNT(*) DESC LIMIT 5";
                     try {
-                        BD.rs=BD.stmt.executeQuery(top5Query);
-                        if(BD.rs.next()==false) {
-                            sendMsg(message, "Вы не сделали ни одного заказа");
-                        }
-                        else{
-                            sendMsg(message,"TOP 5 Ваших заказанных блюд\n");
+                        int number = 1;
+                        char end = 'd';
+                        BD.rs = BD.stmt.executeQuery(top5Query);
+                        sendMsg(message, "TOP 5 Ваших заказанных блюд\n");
+                        if (BD.rs.first() == false) {
+                            sendMsg(message, "Вы ничего не  заказывали");
+                        } else {
+                            BD.rs.beforeFirst();
+
                         while (BD.rs.next()) {
+
                             for (i = 5; i < 21; i++) {
-                                    if ((BD.rs.getInt(2) == i) && (String.valueOf(BD.rs.getInt(2)).endsWith("1")) && (String.valueOf(BD.rs.getInt(2)).endsWith("6")) && (String.valueOf(BD.rs.getInt(2)).endsWith("7")) && (String.valueOf(BD.rs.getInt(2)).endsWith("8")) && (String.valueOf(BD.rs.getInt(2)).endsWith("9"))) {
-                                        even = ' ';
-                                    }
+                                if ((BD.rs.getInt(2) == i) && (String.valueOf(BD.rs.getInt(2)).endsWith("1")) && (String.valueOf(BD.rs.getInt(2)).endsWith("6")) && (String.valueOf(BD.rs.getInt(2)).endsWith("7")) && (String.valueOf(BD.rs.getInt(2)).endsWith("8")) && (String.valueOf(BD.rs.getInt(2)).endsWith("9"))) {
+                                    end = ' ';
                                 }
-                                if (String.valueOf(BD.rs.getInt(2)).endsWith("2") || (String.valueOf(BD.rs.getInt(2)).endsWith("3") || (String.valueOf(BD.rs.getInt(2)).endsWith("4")))) {
-                                    even = 'a';
-                                }
-                                sendMsg(message, BD.rs.getString(1) + " закали  " + BD.rs.getInt(2) + " раз" + even + "\n");
                             }
+                            if (String.valueOf(BD.rs.getInt(2)).endsWith("2") || (String.valueOf(BD.rs.getInt(2)).endsWith("3") || (String.valueOf(BD.rs.getInt(2)).endsWith("4")))) {
+                                end = 'a';
+                            }
+                            sendMsg(message, number + " " + BD.rs.getString(1) + " закали  " + BD.rs.getInt(2) + " раз" + end + "\n");
+                            number++;
                         }
-
-
-
-
-            } catch (SQLException e) {
+                    }
+                    } catch (SQLException e) {
 
                 e.printStackTrace();
             }
