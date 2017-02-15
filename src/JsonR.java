@@ -126,7 +126,8 @@ public class JsonR {
 
             }
         }
-        AdressClosestRest=ClosestRest.replaceAll("=.[0-9]+\\.+[0-9]","").replaceFirst("_"," ").replace(".__","., ");
+        AdressClosestRest=ClosestRest.replaceAll("=.[0-9]+\\.+[0-9]","").replaceAll("=.*","").replace("_"," ").replace(".  ","., ");
+
         ClosestRest ="Ближайщий ресторан РИС к вам находится на "+ClosestRest.replace("_"," ").replace(".","").replaceAll("=.+[0-9]{1}$","")+
                 "\nПримерное время доставки : "+ClosestRest.replaceAll(".[А-я].+.[0-9].+=","").replaceAll(".[0-9]{1}$","")+" мин";
 
@@ -142,6 +143,7 @@ public class JsonR {
             while (BD.rs.next()) {
                 useridformbd = BD.rs.getString(1);
             }
+
          return    useridformbd;
         }
         public String takeIdRest() throws SQLException

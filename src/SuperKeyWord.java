@@ -20,7 +20,7 @@ public class SuperKeyWord {
     List ListofKeywords = new ArrayList();
 
     public String[] findDishKW(Message message) throws SQLException, NullPointerException {
-        String sql1 = "SELECT word FROM ` key_words` WHERE 1";
+        String sql1 = "SELECT word FROM `key_words` WHERE 1";
         BD.rs = BD.stmt.executeQuery(sql1);
         while (BD.rs.next()) {
             ListofKeywords.add(BD.rs.getString(1));
@@ -30,7 +30,7 @@ public class SuperKeyWord {
             Keyword = Keywords[i];//КЛЮЧЕВЫЕ СЛОВА
             String msgText = message.getText();
             if ((msgText.contains("Я не хочу") == false) && (msgText.contains(Keyword))) {
-                String sql = "SELECT dish_name FROM ` key_words`,`dish` WHERE dish.id_keyword=` key_words`.`id` and word='" + Keyword + "'";// АДРЕС CLIENT
+                String sql = "SELECT dish_name FROM `key_words`,`dish` WHERE dish.id_keyword=`key_words`.`id` and word='" + Keyword + "'";// АДРЕС CLIENT
                 BD.rs = BD.stmt.executeQuery(sql);
                 while (BD.rs.next()) {
                     ListofDish.add(BD.rs.getString(1));

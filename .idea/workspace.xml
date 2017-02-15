@@ -39,9 +39,7 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="153">
               <caret line="13" column="4" selection-start-line="13" selection-start-column="4" selection-end-line="13" selection-end-column="4" />
-              <folding>
-                <element signature="imports" expanded="false" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -61,8 +59,8 @@
       <file leaf-file-name="JsonR.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/JsonR.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="511">
-              <caret line="163" column="23" selection-start-line="163" selection-start-column="23" selection-end-line="163" selection-end-column="23" />
+            <state relative-caret-position="1117">
+              <caret line="139" column="56" selection-start-line="139" selection-start-column="56" selection-end-line="139" selection-end-column="56" />
               <folding />
             </state>
           </provider>
@@ -71,27 +69,16 @@
       <file leaf-file-name="SimpleBot.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/SimpleBot.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="274">
-              <caret line="171" column="0" selection-start-line="171" selection-start-column="0" selection-end-line="171" selection-end-column="0" />
+            <state relative-caret-position="228">
+              <caret line="216" column="38" selection-start-line="216" selection-start-column="38" selection-end-line="216" selection-end-column="38" />
               <folding>
                 <element signature="method#main#0;class#SimpleBot#0" expanded="false" />
                 <element signature="method#sendMsg#0;class#SimpleBot#0" expanded="false" />
-                <element signature="method#hello#0;class#SimpleBot#0" expanded="false" />
-                <marker date="1487152546538" expanded="true" signature="11351:14671" ph="..." />
-                <marker date="1487152546538" expanded="true" signature="11533:13064" ph="..." />
-                <marker date="1487152546538" expanded="true" signature="13083:14646" ph="..." />
-                <marker date="1487152546538" expanded="true" signature="13087:13807" ph="..." />
+                <marker date="1487165785240" expanded="true" signature="12683:14749" ph="..." />
+                <marker date="1487165785240" expanded="true" signature="12865:14396" ph="..." />
+                <marker date="1487165785240" expanded="true" signature="14415:14749" ph="..." />
+                <marker date="1487165785240" expanded="true" signature="14419:14749" ph="..." />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SQLError.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/libs/mysql-connector-java-5.1.40/src/com/mysql/jdbc/SQLError.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="190">
-              <caret line="963" column="0" selection-start-line="963" selection-start-column="0" selection-end-line="963" selection-end-column="0" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -99,8 +86,8 @@
       <file leaf-file-name="SuperKeyWord.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/SuperKeyWord.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="26" column="9" selection-start-line="26" selection-start-column="9" selection-end-line="26" selection-end-column="9" />
+            <state relative-caret-position="189">
+              <caret line="29" column="34" selection-start-line="29" selection-start-column="34" selection-end-line="29" selection-end-column="34" />
               <folding />
             </state>
           </provider>
@@ -147,9 +134,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-9" />
-    <option name="y" value="86" />
-    <option name="width" value="1464" />
+    <option name="x" value="222" />
+    <option name="y" value="69" />
+    <option name="width" value="1474" />
     <option name="height" value="978" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
@@ -527,7 +514,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-9" y="86" width="1464" height="978" extended-state="0" />
+    <frame x="222" y="69" width="1474" height="978" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -543,7 +530,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16574585" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16460906" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -570,7 +557,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="8" />
+      <option name="time" value="9" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -591,9 +578,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="204">
           <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -624,11 +609,10 @@
           <folding>
             <element signature="method#main#0;class#SimpleBot#0" expanded="false" />
             <element signature="method#sendMsg#0;class#SimpleBot#0" expanded="false" />
-            <element signature="method#hello#0;class#SimpleBot#0" expanded="false" />
-            <marker date="1487152546538" expanded="true" signature="11351:14671" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="11533:13064" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="13083:14646" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="13087:13807" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="12683:14749" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="12865:14396" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="14415:14749" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="14419:14749" ph="..." />
           </folding>
         </state>
       </provider>
@@ -654,9 +638,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
           <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -687,11 +669,10 @@
           <folding>
             <element signature="method#main#0;class#SimpleBot#0" expanded="false" />
             <element signature="method#sendMsg#0;class#SimpleBot#0" expanded="false" />
-            <element signature="method#hello#0;class#SimpleBot#0" expanded="false" />
-            <marker date="1487152546538" expanded="true" signature="11351:14671" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="11533:13064" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="13083:14646" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="13087:13807" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="12683:14749" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="12865:14396" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="14415:14749" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="14419:14749" ph="..." />
           </folding>
         </state>
       </provider>
@@ -717,9 +698,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
           <caret line="21" column="23" selection-start-line="21" selection-start-column="23" selection-end-line="21" selection-end-column="23" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -750,11 +729,10 @@
           <folding>
             <element signature="method#main#0;class#SimpleBot#0" expanded="false" />
             <element signature="method#sendMsg#0;class#SimpleBot#0" expanded="false" />
-            <element signature="method#hello#0;class#SimpleBot#0" expanded="false" />
-            <marker date="1487152546538" expanded="true" signature="11351:14671" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="11533:13064" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="13083:14646" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="13087:13807" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="12683:14749" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="12865:14396" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="14415:14749" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="14419:14749" ph="..." />
           </folding>
         </state>
       </provider>
@@ -788,9 +766,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
           <caret line="21" column="23" selection-start-line="21" selection-start-column="23" selection-end-line="21" selection-end-column="23" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -821,11 +797,10 @@
           <folding>
             <element signature="method#main#0;class#SimpleBot#0" expanded="false" />
             <element signature="method#sendMsg#0;class#SimpleBot#0" expanded="false" />
-            <element signature="method#hello#0;class#SimpleBot#0" expanded="false" />
-            <marker date="1487152546538" expanded="true" signature="11351:14671" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="11533:13064" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="13083:14646" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="13087:13807" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="12683:14749" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="12865:14396" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="14415:14749" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="14419:14749" ph="..." />
           </folding>
         </state>
       </provider>
@@ -864,16 +839,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/TestDish.java" />
     <entry file="file://$PROJECT_DIR$/src/DishFromKeyW.java" />
-    <entry file="file://$PROJECT_DIR$/src/Dish.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="13" column="4" selection-start-line="13" selection-start-column="4" selection-end-line="13" selection-end-column="4" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/GetPhoneNumber.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
@@ -884,26 +849,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/SuperKeyWord.java">
+    <entry file="file://$PROJECT_DIR$/src/Dish.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="26" column="9" selection-start-line="26" selection-start-column="9" selection-end-line="26" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/UserIntoBD.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="521">
-          <caret line="49" column="0" selection-start-line="49" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/JsonR.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="511">
-          <caret line="163" column="23" selection-start-line="163" selection-start-column="23" selection-end-line="163" selection-end-column="23" />
+        <state relative-caret-position="153">
+          <caret line="13" column="4" selection-start-line="13" selection-start-column="4" selection-end-line="13" selection-end-column="4" />
           <folding />
         </state>
       </provider>
@@ -924,18 +873,41 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/UserIntoBD.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="521">
+          <caret line="49" column="0" selection-start-line="49" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/SuperKeyWord.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="189">
+          <caret line="29" column="34" selection-start-line="29" selection-start-column="34" selection-end-line="29" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/JsonR.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1117">
+          <caret line="139" column="56" selection-start-line="139" selection-start-column="56" selection-end-line="139" selection-end-column="56" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/SimpleBot.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="274">
-          <caret line="171" column="0" selection-start-line="171" selection-start-column="0" selection-end-line="171" selection-end-column="0" />
+        <state relative-caret-position="228">
+          <caret line="216" column="38" selection-start-line="216" selection-start-column="38" selection-end-line="216" selection-end-column="38" />
           <folding>
             <element signature="method#main#0;class#SimpleBot#0" expanded="false" />
             <element signature="method#sendMsg#0;class#SimpleBot#0" expanded="false" />
-            <element signature="method#hello#0;class#SimpleBot#0" expanded="false" />
-            <marker date="1487152546538" expanded="true" signature="11351:14671" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="11533:13064" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="13083:14646" ph="..." />
-            <marker date="1487152546538" expanded="true" signature="13087:13807" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="12683:14749" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="12865:14396" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="14415:14749" ph="..." />
+            <marker date="1487165785240" expanded="true" signature="14419:14749" ph="..." />
           </folding>
         </state>
       </provider>
