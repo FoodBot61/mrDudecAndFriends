@@ -29,7 +29,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 
 public class SimpleBot extends TelegramLongPollingBot {
     int i;
-    String Keywords[];
+    String DishesonKW[];
     String[] DishName;
     String DishQuery;
     boolean forKeyWords;
@@ -62,7 +62,7 @@ public class SimpleBot extends TelegramLongPollingBot {
             telegramBotsApi.registerBot(new SimpleBot());
         } catch (TelegramApiException e) {
             e.printStackTrace();
-        }
+                 }
     }
     @Override
     public String getBotUsername() {
@@ -102,7 +102,7 @@ public class SimpleBot extends TelegramLongPollingBot {
         if (TotalDish != null) {
             userPhone = ph.getPhoneNumb(message);
             if (message.getText().equals(userPhone)) {
-                sendMsg(message, "Введите адрес, чтобы курьер знал куда ехать ");
+                sendMsg(message, "Введите улицу, чтобы курьер знал куда ехать ");
                 takePhone = message.getText();
                 Phone=takePhone;
             }
@@ -143,42 +143,44 @@ public class SimpleBot extends TelegramLongPollingBot {
         }
         if (message != null && message.hasText() && message.getText().contains("/")) {
             switch (cmd) {
-                case "/keywords":
-
-String KeywQuery="SELECT word FROM `key_words`";
-                    try
-                    {
-
-                        BD.rs=BD.stmt.executeQuery(KeywQuery);
-                        sendMsg(message,"Список ключевых слов "+"\n");
-                        while (BD.rs.next())
-                        {
-                            sendMsg(message,BD.rs.getString(1)+"\n");
-
-                        }
-
-                    }catch (SQLException e)
-                    {
-                        e.printStackTrace();
-                    }
-break;
-
-                case "/help":
+                case "/start":
+                    hello(message);
+                    sendMsg(message, "Привет," + user_name);
+                    sendMsg(message,"FoodBot - чат бот ресторана Рис, с помощью которого вы сможете заказывать еду в любое место в городе Ростове-на-Дону. "+
+                            ""+
+                            "При заказе еды используется ваш номер мобильного телефона, чтобы курьер мог связаться с вами. После того, как вы определитесь с заказом "+
+                            ", введете номер мобильного и адрес, куда необходимо доставить заказ, бот автоматически выберет ближайший ресторан. "+
+                            "Будьте внимательны при вводе ваших данных. После подтверждения адреса и телефона заказ отменить уже нельзя!"+"\n");
                     sendMsg(message, "Cписок команд:  \n\n" +
-                            "/top5 - выводит топ 5 блюд, которые вы заказывали " +
+                            "/start - начало работы с ботом" +
+                            "\n/top5 - выводит топ 5 блюд, которые заказывали пользователи" +
                             "\n/help - выводит список команд" +
-                            "\n/keywords - выводит список ключевых слов" +
-                            "\n/favlist - бла бла бла \n\n" +
+                            "\n/favlist - выводит список блюд, которые вы заказывали чаще всего \n\n" +
                             "\t Описание работы с ботом \n\n" +
                             "Для начала заказа введите ключевые слова или названия блюд." +
-                            "\nДля того чтобы заверишь заказ введите STOP.\nЧтобы убрать блюдо из общей корзины");
+                            "Ключевые слова это общее название блюда, например: шаурма, суп (Примечание: вводить ключевые слова необходимо с маленькой буквы)."+
+                            "\nДля того чтобы заверишь заказ введите Стоп.\nЧтобы убрать блюдо из общей корзины введите 'Я не хочу' и название блюда.");
+                    break;
+                case "/help":
+                    sendMsg(message, "Доступные команды:  \n\n" +
+                            "/start - начало работы с ботом" +
+                            "\n/top5 - выводит топ 5 блюд, которые заказывали пользователи" +
+                            "\n/help - выводит список команд" +
+                            "\n/favlist - выводит список блюд, которые вы заказывали чаще всего \n\n" +
+                            "\t Описание работы с ботом \n\n" +
+                            "Для начала заказа введите ключевые слова или названия блюд." +
+                            "Ключевые слова это общее название блюда, например: шаурма, суп(Примечание: вводить ключевые слова необходимо с маленькой буквы)."+
+                            "\nДля того чтобы заверишь заказ введите Стоп.\nЧтобы убрать блюдо из общей корзины введите 'Я не хочу' и название блюда."+
+                            "При заказе еды используется Ваш номер мобильного телефона, чтобы курьер мог связаться с Вами. После того, как вы определитесь с заказом "+
+                            ", введете номер мобильного и адрес, куда необходимо доставить заказ, бот автоматически выберет ближайший ресторан. " +
+                            "Будьте внимательны при вводе Ваших данных. После подтверждения адреса и телефона заказ отменить уже нельзя!"+"\n");
                     break;
                 case "/favlist":
                     user_id = jsonR.UserIdFromMessage(message);
                     String favlistQuery="SELECT dish,COUNT(id_dish) FROM `log` WHERE user_id='"+user_id+"' GROUP BY id_dish ORDER BY COUNT(*) DESC LIMIT 4";
                     try {
                         int number = 1;
-                        char end = 'd';
+                        char end = ' ';
                         BD.rs = BD.stmt.executeQuery(favlistQuery);
                         sendMsg(message, "Ваши наиболее заказываемые блюда\n");
                         if (BD.rs.first() == false) {
@@ -221,17 +223,6 @@ break;
                         e.printStackTrace();
                     }
                     break;
-                case "/start":
-                    hello(message);
-                    sendMsg(message, "Привет," + user_name);
-                    sendMsg(message, "Cписок команд:  \n\n" +
-                            "/top5 - выводит топ 102000000 блюд" +
-                            "\n/help - выводит список команд" +
-                            "\n/favlist - бла бла бла \n\n" +
-                            "\t Описание работы с ботом \n\n" +
-                            "Для начала заказа введите ключевые слова или названия блюд." +
-                            "\nДля того чтобы заверишь заказ введите STOP.\nЧтобы убрать блюдо из общей корзины");
-                    break;
                 default:
                     sendMsg(message, "Нет такой команды. Для полного списка команд используйте /help");
             }
@@ -245,7 +236,7 @@ break;
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if (message.getText().contains("Я не хочу ")) {
+        if (message.getText().contains("Я не хочу ")||(message.getText().contains("я не хочу "))) {
             // УДАЛЕНИЕ БЛЮДА ИЗ ОБЩЕГО СПИСКА
             for (i = 0; i < DishName.length; i++) {
                 if ((Dishes.contains(DishName[i])) & (message.getText().equals("Я не хочу " + DishName[i]))) {
@@ -289,12 +280,12 @@ break;
             }
         }
 
-            if (message.getText().equals("STOP")) {
+            if (message.getText().equalsIgnoreCase("стоп")) {
                 if (Dishes != null && Price != 0) {
                     sendMsg(message, "Ваш заказ : " + Dishes + " " + "на сумму" + TotalPrice + " rub");
                     Price = 0;
                     Dishes = "";
-                    sendMsg(message, "Введите номер телефона, чтобы курьер смог связаться с вами");
+                    sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
                 } else {
                     sendMsg(message, "Закажите что-нибудь.Надо поесть");
                 }
@@ -322,6 +313,7 @@ break;
                         }
                         try {
                             String closrest = jsonR.DistanseBe(address);
+                            sendMsg(message,"Ожидайте Ваш заказ.");
                             sendMsg(message, closrest);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -372,6 +364,7 @@ break;
 
                     case "Нет" :
                         sendMsg(message,"\nВведите данные повторно");
+                        sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
                         getPhoneAndAddress(message);
                         break;
                 }
@@ -379,10 +372,10 @@ break;
 
             if (!forKeyWords){
                 try {
-                    Keywords = keyw.findDishKW(message);
-                    if (Keywords != null) {
-                        for (i = 0; i < Keywords.length; i++) {
-                            sendMsg(message, (i + 1 + " " + Keywords[i]));
+                    DishesonKW = keyw.findDishKW(message);
+                    if (DishesonKW  != null) {
+                        for (i = 0; i < DishesonKW .length; i++) {
+                            sendMsg(message, (i + 1 + " " + DishesonKW [i]));
                         }
                         sendMsg(message, "Введите название блюда");
                     }
