@@ -13,7 +13,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/watashiwaifu$Unnamed.coverage" NAME="Unnamed Coverage Results" MODIFIED="1487147152777" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/watashiwaifu$Unnamed.coverage" NAME="Unnamed Coverage Results" MODIFIED="1487315817916" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
@@ -37,8 +37,8 @@
       <file leaf-file-name="Dish.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Dish.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="14" column="44" selection-start-line="14" selection-start-column="16" selection-end-line="14" selection-end-column="44" />
+            <state relative-caret-position="119">
+              <caret line="11" column="37" selection-start-line="11" selection-start-column="37" selection-end-line="11" selection-end-column="37" />
               <folding />
             </state>
           </provider>
@@ -47,8 +47,8 @@
       <file leaf-file-name="JsonR.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/JsonR.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="298">
-              <caret line="150" column="69" selection-start-line="150" selection-start-column="27" selection-end-line="150" selection-end-column="69" />
+            <state relative-caret-position="1539">
+              <caret line="145" column="0" selection-start-line="145" selection-start-column="0" selection-end-line="145" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -57,14 +57,13 @@
       <file leaf-file-name="SimpleBot.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/SimpleBot.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="43">
-              <caret line="355" column="73" selection-start-line="346" selection-start-column="52" selection-end-line="355" selection-end-column="73" />
+            <state relative-caret-position="170">
+              <caret line="291" column="61" selection-start-line="291" selection-start-column="61" selection-end-line="291" selection-end-column="61" />
               <folding>
-                <element signature="method#sendMsg#0;class#SimpleBot#0" expanded="false" />
-                <marker date="1487238248628" expanded="true" signature="13894:16028" ph="..." />
-                <marker date="1487238248628" expanded="true" signature="14076:15675" ph="..." />
-                <marker date="1487238248628" expanded="true" signature="15694:16028" ph="..." />
-                <marker date="1487238248628" expanded="true" signature="15698:16028" ph="..." />
+                <element signature="imports" expanded="true" />
+                <marker date="1487623387287" expanded="false" signature="1971:1977" ph=" }" />
+                <marker date="1487623387287" expanded="false" signature="2024:2035" ph=" { " />
+                <marker date="1487623387287" expanded="false" signature="2090:2096" ph=" }" />
               </folding>
             </state>
           </provider>
@@ -73,8 +72,8 @@
       <file leaf-file-name="SuperKeyWord.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/SuperKeyWord.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="408">
-              <caret line="32" column="119" selection-start-line="32" selection-start-column="29" selection-end-line="32" selection-end-column="119" />
+            <state relative-caret-position="179">
+              <caret line="21" column="20" selection-start-line="21" selection-start-column="20" selection-end-line="21" selection-end-column="20" />
               <folding />
             </state>
           </provider>
@@ -83,8 +82,8 @@
       <file leaf-file-name="UserIntoBD.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/UserIntoBD.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="26" column="49" selection-start-line="22" selection-start-column="21" selection-end-line="26" selection-end-column="49" />
+            <state relative-caret-position="221">
+              <caret line="17" column="17" selection-start-line="17" selection-start-column="17" selection-end-line="17" selection-end-column="17" />
               <folding />
             </state>
           </provider>
@@ -107,9 +106,9 @@
         <option value="$PROJECT_DIR$/src/Logging.java" />
         <option value="$PROJECT_DIR$/src/UserIntoBD.java" />
         <option value="$PROJECT_DIR$/src/JsonR.java" />
-        <option value="$PROJECT_DIR$/src/SimpleBot.java" />
         <option value="$PROJECT_DIR$/src/Dish.java" />
         <option value="$PROJECT_DIR$/src/SuperKeyWord.java" />
+        <option value="$PROJECT_DIR$/src/SimpleBot.java" />
       </list>
     </option>
   </component>
@@ -151,6 +150,9 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -207,9 +209,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scratches" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -502,20 +501,21 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946146" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2882788" sideWeight="0.3609375" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2903907" sideWeight="0.6390625" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.37381205" sideWeight="0.6390625" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.125" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23333333" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -525,9 +525,8 @@
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="6" side_tool="false" content_ui="combo" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946146" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.10428177" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.08352941" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32946146" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -544,7 +543,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="9" />
+      <option name="time" value="10" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -591,11 +590,10 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="method#sendMsg#0;class#SimpleBot#0" expanded="false" />
-            <marker date="1487238248628" expanded="true" signature="13894:16028" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="14076:15675" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="15694:16028" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="15698:16028" ph="..." />
+            <element signature="imports" expanded="true" />
+            <marker date="1487623387287" expanded="false" signature="1971:1977" ph=" }" />
+            <marker date="1487623387287" expanded="false" signature="2024:2035" ph=" { " />
+            <marker date="1487623387287" expanded="false" signature="2090:2096" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -647,11 +645,10 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="method#sendMsg#0;class#SimpleBot#0" expanded="false" />
-            <marker date="1487238248628" expanded="true" signature="13894:16028" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="14076:15675" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="15694:16028" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="15698:16028" ph="..." />
+            <element signature="imports" expanded="true" />
+            <marker date="1487623387287" expanded="false" signature="1971:1977" ph=" }" />
+            <marker date="1487623387287" expanded="false" signature="2024:2035" ph=" { " />
+            <marker date="1487623387287" expanded="false" signature="2090:2096" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -703,11 +700,10 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="method#sendMsg#0;class#SimpleBot#0" expanded="false" />
-            <marker date="1487238248628" expanded="true" signature="13894:16028" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="14076:15675" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="15694:16028" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="15698:16028" ph="..." />
+            <element signature="imports" expanded="true" />
+            <marker date="1487623387287" expanded="false" signature="1971:1977" ph=" }" />
+            <marker date="1487623387287" expanded="false" signature="2024:2035" ph=" { " />
+            <marker date="1487623387287" expanded="false" signature="2090:2096" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -767,11 +763,10 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="method#sendMsg#0;class#SimpleBot#0" expanded="false" />
-            <marker date="1487238248628" expanded="true" signature="13894:16028" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="14076:15675" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="15694:16028" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="15698:16028" ph="..." />
+            <element signature="imports" expanded="true" />
+            <marker date="1487623387287" expanded="false" signature="1971:1977" ph=" }" />
+            <marker date="1487623387287" expanded="false" signature="2024:2035" ph=" { " />
+            <marker date="1487623387287" expanded="false" signature="2090:2096" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -832,48 +827,47 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/UserIntoBD.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="17" column="17" selection-start-line="17" selection-start-column="17" selection-end-line="17" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/Dish.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="14" column="44" selection-start-line="14" selection-start-column="16" selection-end-line="14" selection-end-column="44" />
+        <state relative-caret-position="119">
+          <caret line="11" column="37" selection-start-line="11" selection-start-column="37" selection-end-line="11" selection-end-column="37" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/JsonR.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="298">
-          <caret line="150" column="69" selection-start-line="150" selection-start-column="27" selection-end-line="150" selection-end-column="69" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/UserIntoBD.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="26" column="49" selection-start-line="22" selection-start-column="21" selection-end-line="26" selection-end-column="49" />
+        <state relative-caret-position="1539">
+          <caret line="145" column="0" selection-start-line="145" selection-start-column="0" selection-end-line="145" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/SuperKeyWord.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="32" column="119" selection-start-line="32" selection-start-column="29" selection-end-line="32" selection-end-column="119" />
+        <state relative-caret-position="179">
+          <caret line="21" column="20" selection-start-line="21" selection-start-column="20" selection-end-line="21" selection-end-column="20" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/SimpleBot.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="43">
-          <caret line="355" column="73" selection-start-line="346" selection-start-column="52" selection-end-line="355" selection-end-column="73" />
+        <state relative-caret-position="170">
+          <caret line="291" column="61" selection-start-line="291" selection-start-column="61" selection-end-line="291" selection-end-column="61" />
           <folding>
-            <element signature="method#sendMsg#0;class#SimpleBot#0" expanded="false" />
-            <marker date="1487238248628" expanded="true" signature="13894:16028" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="14076:15675" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="15694:16028" ph="..." />
-            <marker date="1487238248628" expanded="true" signature="15698:16028" ph="..." />
+            <element signature="imports" expanded="true" />
+            <marker date="1487623387287" expanded="false" signature="1971:1977" ph=" }" />
+            <marker date="1487623387287" expanded="false" signature="2024:2035" ph=" { " />
+            <marker date="1487623387287" expanded="false" signature="2090:2096" ph=" }" />
           </folding>
         </state>
       </provider>

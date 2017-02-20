@@ -55,6 +55,7 @@ public class SimpleBot extends TelegramLongPollingBot {
     String dish;
     String TotalDishforLog;
     //ТЕСТ ПЕРЕМЕННЫЕ
+    Boolean сheckfordescribe=true;
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
@@ -62,6 +63,7 @@ public class SimpleBot extends TelegramLongPollingBot {
             telegramBotsApi.registerBot(new SimpleBot());
         } catch (TelegramApiException e) {
             e.printStackTrace();
+
                  }
     }
     @Override
@@ -258,12 +260,14 @@ public class SimpleBot extends TelegramLongPollingBot {
             }
         } else {
             for (i = 0; i < DishName.length; i++) {
-                if ((message.getText().contains(DishName[i]))) {
+                if ((message.getText().equals(DishName[i]))) {
                     DishQuery = "SELECT * FROM `dish` WHERE dish_name ='" + DishName[i] + "'";
                     try {
                         BD.rs = BD.stmt.executeQuery(DishQuery);
                         while (BD.rs.next()) {
-                            sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n" + "Описание : " + BD.rs.getString(4) + "\n" + "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Фото : " + BD.rs.getString(3));
+                            if(сheckfordescribe){
+                            sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n" + "Описание : "
+                                    + BD.rs.getString(4) + "\n" + "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Фото : " + BD.rs.getString(3));}
                             Dishes = BD.rs.getString(2) + " | " + Dishes;
                             TotalDish = Dishes;
                             Price = BD.rs.getInt(5) + Price;
@@ -276,11 +280,33 @@ public class SimpleBot extends TelegramLongPollingBot {
                     }
                     sendMsg(message, "Итоговая стоимость = " + TotalPrice + " rub");// отсюда и пляши, дядя
                     sendMsg(message, "Итоговый заказ : " + Dishes);
-
+                    forKeyWords = true;
             }
         }
+            if (!forKeyWords){
+                try {
+                    DishesonKW = keyw.findDishKW(message);
+                    сheckfordescribe = false;
+                    if (DishesonKW  != null) {
+                        for (i = 0; i < DishesonKW .length; i++) {
+                            DishQuery = "SELECT * FROM `dish` WHERE dish_name='" + DishesonKW[i] + "'";
+                            sendMsg(message, (i + 1 + ")" ));
+                            BD.rs = BD.stmt.executeQuery(DishQuery);
+                            while (BD.rs.next()) {
+                                sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n" + "Описание : " + BD.rs.getString(4) + "\n" +
+                                        "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Фото : " + BD.rs.getString(3));
+                            }
+                        }
+                        sendMsg(message, "Введите название блюда");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
 
+                }
+            }
+            forKeyWords = false;
             if (message.getText().equalsIgnoreCase("стоп")) {
+                сheckfordescribe = true;
                 if (Dishes != null && Price != 0) {
                     sendMsg(message, "Ваш заказ : " + Dishes + " " + "на сумму" + TotalPrice + " rub");
                     Price = 0;
@@ -355,7 +381,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                                         " `id_res` = '" + usirId + "'," +
                                         " `id_dish` = '" + idDish + "' ";
                                 BD.stmt.executeUpdate(logvalues);
-
+                                сheckfordescribe = true;
                             } catch (SQLException sqlEx) {
                                 sqlEx.printStackTrace();
                             }
@@ -370,22 +396,9 @@ public class SimpleBot extends TelegramLongPollingBot {
                 }
             }
 
-            if (!forKeyWords){
-                try {
-                    DishesonKW = keyw.findDishKW(message);
-                    if (DishesonKW  != null) {
-                        for (i = 0; i < DishesonKW .length; i++) {
-                            sendMsg(message, (i + 1 + " " + DishesonKW [i]));
-                        }
-                        sendMsg(message, "Введите название блюда");
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-            forKeyWords = false;
         }
         }
+
 
     }
 

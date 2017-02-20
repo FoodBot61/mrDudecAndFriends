@@ -29,7 +29,7 @@ public class SuperKeyWord {
         for (int i = 0; i < ListofKeywords.size(); i++) {
             Keyword = Keywords[i];//КЛЮЧЕВЫЕ СЛОВА
             String msgText = message.getText();
-            if ((msgText.contains("Я не хочу") == false) && (msgText.contains(Keyword))) {
+            if ((msgText.contains("Я не хочу") == false) && (msgText.toLowerCase().contains(Keyword))) {
                 String sql = "SELECT dish_name FROM `key_words`,`dish` WHERE dish.id_keyword=`key_words`.`id` and word='" + Keyword + "'";// АДРЕС CLIENT
                 BD.rs = BD.stmt.executeQuery(sql);
                 while (BD.rs.next()) {
