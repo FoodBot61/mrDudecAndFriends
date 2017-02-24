@@ -8,18 +8,19 @@ import org.telegram.telegrambots.generics.BotSession;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * Created by user on 22.01.2017.
  */
 public class SuperKeyWord {
-    String[] Dishes;
-    String Dish;
-    String[] Keywords;
-    String Keyword;
-    List ListofDish = new ArrayList();
-    List ListofKeywords = new ArrayList();
+    private String[] Dishes;
+    private String[] Keywords;
+    private String Keyword;
+    private List ListofDish = new ArrayList();
+    private List ListofKeywords = new ArrayList();
 
     public String[] findDishKW(Message message) throws SQLException, NullPointerException {
+
         String sql1 = "SELECT word FROM `key_words`";
         BD.rs = BD.stmt.executeQuery(sql1);
         while (BD.rs.next()) {
@@ -27,7 +28,7 @@ public class SuperKeyWord {
         }
         Keywords = (String[]) ListofKeywords.toArray(new String[ListofDish.size()]);
         for (int i = 0; i < ListofKeywords.size(); i++) {
-            Keyword = Keywords[i];//КЛЮЧЕВЫЕ СЛОВА
+            Keyword = Keywords[i];
             String msgText = message.getText();
             if ((msgText.contains("Я не хочу") == false) && (msgText.toLowerCase().contains(Keyword))) {
                 String sql = "SELECT dish_name FROM `key_words`,`dish` WHERE dish.id_keyword=`key_words`.`id` and word='" + Keyword + "'";// АДРЕС CLIENT
@@ -38,8 +39,8 @@ public class SuperKeyWord {
                 Dishes = (String[]) ListofDish.toArray(new String[ListofDish.size()]);
             }
         }
-        for (int i1 = 0; i1 < ListofDish.size(); i1++)
-        {
+        for (int i1 = 0; i1 < ListofDish.size(); i1++) {
+            String Dish;
             Dish = Dishes[i1];
         }
         return Dishes;

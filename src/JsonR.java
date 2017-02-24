@@ -28,17 +28,17 @@ import java.util.regex.Pattern;
  * Created by user on 02.02.2017.
  */
 public class JsonR {
-    String ClientAddress;
-    String RestAddress;
-    double MinDistance;
-    final Map<String, String> params = Maps.newHashMap();
-    HashMap<String, Double> Distance = new HashMap<>();
-    Set<Map.Entry<String, Double>> entrySet = Distance.entrySet();
-    String ClosestRest;
-    String AdressClosestRest;
-    String useridformbd;
-    String IdRest;
-    String user_id;
+    private String ClientAddress;
+    private String RestAddress;
+    private double MinDistance;
+    private final Map<String, String> params = Maps.newHashMap();
+    private HashMap<String, Double> Distance = new HashMap<>();
+    private Set<Map.Entry<String, Double>> entrySet = Distance.entrySet();
+    private String ClosestRest;
+    private String AdressClosestRest;
+    private String useridformbd;
+    private String IdRest;
+    private String user_id;
 
     private static String ReadAll(final Reader rd) throws IOException {
         final StringBuilder sb = new StringBuilder();
@@ -63,25 +63,24 @@ public class JsonR {
 
     protected static String encode(final Map<String, String> params) {
         final String paramsUrl = Joiner.on('&').join(// получаем значение вида key1=value1&key2=value2...
-            Iterables.transform(params.entrySet(), new Function<Map.Entry<String, String>, String>() {
-               @Override
-               public String apply(final Map.Entry<String, String> input) {
-                  try {
-                      final StringBuffer buffer = new StringBuffer();
-                      buffer.append(input.getKey());// получаем значение вида key=value
-                      buffer.append('=');
-                      buffer.append(URLEncoder.encode(input.getValue(), "utf-8"));// кодируем строку в соответствии со стандартом HTML 4.01
-                      return buffer.toString();
-                   } catch (final UnsupportedEncodingException e) {
-                      throw new RuntimeException(e);
-                   }
-               }
+                Iterables.transform(params.entrySet(), new Function<Map.Entry<String, String>, String>() {
+                    @Override
+                    public String apply(final Map.Entry<String, String> input) {
+                        try {
+                            final StringBuffer buffer = new StringBuffer();
+                            buffer.append(input.getKey());// получаем значение вида key=value
+                            buffer.append('=');
+                            buffer.append(URLEncoder.encode(input.getValue(), "utf-8"));// кодируем строку в соответствии со стандартом HTML 4.01
+                            return buffer.toString();
+                        } catch (final UnsupportedEncodingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
                 }));
         return paramsUrl;
     }
 
-    public String URLmaker(Message message)
-    {
+    public String makeURL(Message message) {
         params.put("address", "Ростовская область, Ростов-на-Дону " + message.getText());
         params.put("language", "ru");
         String baseURL = "http://maps.googleapis.com/maps/api/geocode/json";
@@ -96,7 +95,7 @@ public class JsonR {
         return ClientAddress;
     }
 
-    public String DistanseBe(String ClientAddress) throws IOException, SQLException {
+    public String chooseClosRest(String ClientAddress) throws IOException, SQLException {
         String addressQuery = "SELECT address FROM resbuild";
         try {
             BD.rs = BD.stmt.executeQuery(addressQuery);
@@ -105,7 +104,7 @@ public class JsonR {
         }
         while (BD.rs.next()) {
             RestAddress = BD.rs.getString(1).replace(" ", "_").replace(",", "_");
-            String url = new String("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + ClientAddress.replace(" ","_").replace(",", "_") + "&destinations=" + RestAddress) + encode(params);
+            String url = new String("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + ClientAddress.replace(" ", "_").replace(",", "_") + "&destinations=" + RestAddress) + encode(params);
             final JSONObject response = JsonR.read(url);
             String timebetween2loc = response.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject("duration").getString("text").replace("mins", "").replace("min", "").trim();
             double TimetoRest = Double.parseDouble(timebetween2loc);
@@ -118,45 +117,37 @@ public class JsonR {
                 MinDistance = (double) DistanceValues[i];
             }
         }
-        Object KeytoRest= MinDistance;
+        Object KeytoRest = MinDistance;
         for (Map.Entry<String, Double> pair : entrySet) {
             if (KeytoRest.equals(pair.getValue())) {
                 ClosestRest = pair.toString();
-
-
             }
         }
-        AdressClosestRest=ClosestRest.replaceAll("=.[0-9]+\\.+[0-9]","").replaceAll("=.*","").replace("_"," ").replace(".  ","., ");
+        AdressClosestRest = ClosestRest.replaceAll("=.[0-9]+\\.+[0-9]", "").replaceAll("=.*", "").replace("_", " ").replace(".  ", "., ");
+        ClosestRest = "Ближайщий ресторан РИС к вам находится на " + ClosestRest.replace("_", " ").replace(".", "").replaceAll("=.+[0-9]{1}$", "") +
+                "\nПримерное время доставки : " + ClosestRest.replaceAll(".[А-я].+.[0-9].+=", "").replaceAll(".[0-9]{1}$", "") + " мин";
+        return ClosestRest;
+    }
 
-        ClosestRest ="Ближайщий ресторан РИС к вам находится на "+ClosestRest.replace("_"," ").replace(".","").replaceAll("=.+[0-9]{1}$","")+
-                "\nПримерное время доставки : "+ClosestRest.replaceAll(".[А-я].+.[0-9].+=","").replaceAll(".[0-9]{1}$","")+" мин";
-
-            return ClosestRest;
-
-
-
+    public String takeUserId() throws SQLException {
+        String UserIdQuery = "SELECT user_id FROM resbuild WHERE address='" + AdressClosestRest + "'";
+        BD.rs = BD.stmt.executeQuery(UserIdQuery);
+        while (BD.rs.next()) {
+            useridformbd = BD.rs.getString(1);
         }
+        return useridformbd;
+    }
 
-        public String takeUserId() throws SQLException {
-            String UserIdQuery="SELECT user_id FROM resbuild WHERE address='" + AdressClosestRest + "'";
-            BD.rs=BD.stmt.executeQuery(UserIdQuery);
-            while (BD.rs.next()) {
-                useridformbd = BD.rs.getString(1);
-            }
-
-         return    useridformbd;
-        }
-        public String takeIdRest() throws SQLException
-    {
-        String IdResQuery="SELECT id_res FROM resbuild WHERE address='"+AdressClosestRest+"'";
-        BD.rs=BD.stmt.executeQuery(IdResQuery);
-        while (BD.rs.next())
-        {
-            IdRest=BD.rs.getString(1);
+    public String takeIdRest() throws SQLException {
+        String IdResQuery = "SELECT id_res FROM resbuild WHERE address='" + AdressClosestRest + "'";
+        BD.rs = BD.stmt.executeQuery(IdResQuery);
+        while (BD.rs.next()) {
+            IdRest = BD.rs.getString(1);
         }
         return IdRest;
     }
-        public String UserIdFromMessage(Message message){
+
+    public String takeUserIdFromMessage(Message message) {
         String fullmsg = message.toString();
         Pattern p = Pattern.compile("id=[0-9]+,");
         Matcher m = p.matcher(fullmsg);
@@ -165,7 +156,7 @@ public class JsonR {
         }
         return user_id;
     }
-    }
+}
 
 
 
