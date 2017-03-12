@@ -7,6 +7,7 @@ import com.google.common.collect.Iterables;
 import com.google.maps.*;
 import com.google.maps.model.*;
 import com.squareup.okhttp.Address;
+import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import jersey.repackaged.com.google.common.collect.Maps;
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -373,6 +373,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                                 "\nЗаказ: " + TotalDish.replace("|", ",") +
                                 "\nИтоговая стоимость: " + TotalPrice + " руб");
                         address = null;
+                        letmeError = true;
                         try {
                             usirId = jsonR.takeIdRest();
                         } catch (SQLException e) {
@@ -403,6 +404,67 @@ public class SimpleBot extends TelegramLongPollingBot {
                     break;
             }
         }
+
+
+
+        ////////
+
+
+
+
+        if(message.getText().matches("timeismoney+.*[А-я]+.[0-9]{0,4}"))
+        {
+            Boolean bool=true;
+            Long IdUser= (message.getChatId());
+            String Address = message.getText().substring(12).trim();
+            String UserFromRest="SELECT DISTINCT resbuild.address FROM `user`,`res`,`resbuild`";
+            try {
+                BD.rs=BD.stmt.executeQuery(UserFromRest);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+                while(BD.rs.next())
+                {
+                    System.out.print(Address);
+                    System.out.print(BD.rs.getString(1)+"\n");
+                    if(Address.equals(BD.rs.getString(1)))
+                    {
+                        String AddIdUserQuery="UPDATE resbuild SET resbuild.user_id='"+IdUser+"' WHERE resbuild.address='"+Address+"'";
+                        BD.stmt.executeUpdate(AddIdUserQuery);
+                        bool=true;
+                    }
+                    else {
+                        bool = false;
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            if(!bool)
+            {
+                sendMsg(message,"Введите секретное слово и адрес Вашего ресторана");
+            }
+            else {
+                sendMsg(message,"К Вашему ресторану привязан аккаунт telegram");
+            }
+            letmeError=true;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //
         if ((takePhone == null) && (address == null) && (DishesonKW == null) && (message.getText().equalsIgnoreCase("стоп") == false)
                 && (message.getText().equalsIgnoreCase("Привет") == false)
                 && (message.getText().contains("/") == false) && (letmeError == false)) {
