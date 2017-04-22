@@ -39,10 +39,6 @@ public class SuperKeyWord {
                 Dishes = (String[]) ListofDish.toArray(new String[ListofDish.size()]);
             }
         }
-        for (int i1 = 0; i1 < ListofDish.size(); i1++) {
-            String Dish;
-            Dish = Dishes[i1];
-        }
         return Dishes;
     }
 }

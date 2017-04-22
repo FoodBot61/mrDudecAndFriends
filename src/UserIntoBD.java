@@ -39,7 +39,6 @@ public class UserIntoBD extends BD {
             user_id = fullmsg.substring(m.start() + 3, m.end() - 1);
         }
     }
-
     public void findUserName(String fullmsg) {
         Pattern p = Pattern.compile("firstName='[^0-9]+'+,+.l");
         Matcher m = p.matcher(fullmsg);
