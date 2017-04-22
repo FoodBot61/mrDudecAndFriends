@@ -56,7 +56,7 @@ public class SimpleBot extends TelegramLongPollingBot {
     private String dish;
     private String TotalDishforLog;
     private Boolean letmeError;
-    int OrderNumber=1;
+    int OrderNumber = 1;
     //ТЕСТ ПЕРЕМЕННЫЕ
 
     public static void main(String[] args) throws IOException {
@@ -236,6 +236,9 @@ public class SimpleBot extends TelegramLongPollingBot {
         }
         try {
             DishName = td.findDish();
+//            for (i = 0; i < DishName.length; i++) {
+//            System.out.print("\n"+DishName[i]);
+//            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -271,13 +274,19 @@ public class SimpleBot extends TelegramLongPollingBot {
         } else {
             for (i = 0; i < DishName.length; i++) {
                 if ((message.getText().equals(DishName[i]))) {
-                    DishQuery = "SELECT * FROM `dish` WHERE dish_name ='" + DishName[i] + "'";
+                    String[] dish = DishName[i].split("из");
+                    System.out.print(dish[0]);
+                    System.out.print(dish[1]);
+                    DishQuery = "SELECT dish.id,dish.dish_name,dish.icons,dish.descr_dish,dish.price,dish.ingredient " +
+                            "FROM `dish`,`res`,`dishes` where dish_name='" + dish[0].trim() + "'" +
+                            " and dishes.id_dish=dish.id and res.id=dishes.id_res and res.name='" + dish[1].trim() + "'";
                     try {
                         BD.rs = BD.stmt.executeQuery(DishQuery);
                         while (BD.rs.next()) {
-                                sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n" + "Описание : "
-                                        + BD.rs.getString(4) + "\n" + "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Фото : " + BD.rs.getString(3));
-                                                        Dishes = BD.rs.getString(2) + " | " + Dishes;
+                            sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n" + "Описание : "
+                                    + BD.rs.getString(4) + "\n" + "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Фото : " + BD.rs.getString(3) +
+                                    "\n" + "Ресторан : " + dish[1]);
+                            Dishes = BD.rs.getString(2) + " | " + Dishes;
                             TotalDish = Dishes;
                             Price = BD.rs.getInt(5) + Price;
                             TotalPrice = Price;
@@ -297,15 +306,21 @@ public class SimpleBot extends TelegramLongPollingBot {
                 DishesonKW = keyw.findDishKW(message);
                 if (DishesonKW != null) {
                     for (i = 0; i < DishesonKW.length; i++) {
-                        DishQuery = "SELECT * FROM `dish` WHERE dish_name='" + DishesonKW[i] + "'";
+                        String[] dish = DishesonKW[i].split("из");
+                        DishQuery = "SELECT dish.id,dish.dish_name,dish.icons,dish.descr_dish,dish.price,dish.ingredient,res.name FROM `dish`,`res`,`dishes`,`key_words` " +
+                                "where dishes.id_dish=dish.id and res.id=dishes.id_res and key_words.id=dishes.id_keyword and dish.dish_name='" + dish[0].trim() + "' and res.name='" + dish[1].trim() + "'";
                         sendMsg(message, (i + 1 + ")"));
                         BD.rs = BD.stmt.executeQuery(DishQuery);
                         while (BD.rs.next()) {
                             sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n" + "Описание : " + BD.rs.getString(4) + "\n" +
-                                    "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Фото : " + BD.rs.getString(3));
+                                    "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Ресторан : " + BD.rs.getString(7)
+                                    + "\n" + "Фото : " + BD.rs.getString(3)
+                            );
+
                         }
+
                     }
-                    sendMsg(message, "Введите название блюда");
+                    sendMsg(message, "Чтобы включить в заказ блюдо введите 'Название блюда' из 'Название ресторана'");
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -346,7 +361,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                     try {
                         String closrest = jsonR.chooseClosRest(address);
 
-                        sendMsg(message, "Номер Вашего заказа :" +OrderNumber+"\nОжидайте Ваш заказ.");
+                        sendMsg(message, "Номер Вашего заказа :" + OrderNumber + "\nОжидайте Ваш заказ.");
                         sendMsg(message, closrest);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -361,7 +376,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                     hello(message);
                     String ta = TotalDishforLog.replace(" |", "-");
                     String[] boom = ta.split("-");
-                    sendMsgToRest(message,"Номер заказа "+OrderNumber+
+                    sendMsgToRest(message, "Номер заказа " + OrderNumber +
                             "\nАдрес клиента: " + address +
                             "\nТелефон клиента: " + Phone +
                             "\nЗаказ: " + TotalDish.replace("|", ",") +
@@ -406,69 +421,47 @@ public class SimpleBot extends TelegramLongPollingBot {
         }
 
 
-
         ////////
 
 
-
-
-        if(message.getText().matches("timeismoney+.*[А-я]+.[0-9]{0,4}"))
-        {
-            Boolean bool=true;
-            Long IdUser= (message.getChatId());
+        if (message.getText().matches("timeismoney+.*[А-я]+.[0-9]{0,4}")) {
+            Boolean bool = true;
+            Long IdUser = (message.getChatId());
             String Address = message.getText().substring(12).trim();
-            String UserFromRest="SELECT DISTINCT resbuild.address FROM `user`,`res`,`resbuild`";
+            String UserFromRest = "SELECT DISTINCT resbuild.address FROM `user`,`res`,`resbuild`";
             try {
-                BD.rs=BD.stmt.executeQuery(UserFromRest);
+                BD.rs = BD.stmt.executeQuery(UserFromRest);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
             try {
-                while(BD.rs.next())
-                {
+                while (BD.rs.next()) {
                     System.out.print(Address);
-                    System.out.print(BD.rs.getString(1)+"\n");
-                    if(Address.equals(BD.rs.getString(1)))
-                    {
-                        String AddIdUserQuery="UPDATE resbuild SET resbuild.user_id='"+IdUser+"' WHERE resbuild.address='"+Address+"'";
+                    System.out.print(BD.rs.getString(1) + "\n");
+                    if (Address.equals(BD.rs.getString(1))) {
+                        String AddIdUserQuery = "UPDATE resbuild SET resbuild.user_id='" + IdUser + "' WHERE resbuild.address='" + Address + "'";
                         BD.stmt.executeUpdate(AddIdUserQuery);
-                        bool=true;
-                    }
-                    else {
+                        bool = true;
+                    } else {
                         bool = false;
                     }
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            if(!bool)
-            {
-                sendMsg(message,"Введите секретное слово и адрес Вашего ресторана");
+            if (!bool) {
+                sendMsg(message, "Введите секретное слово и адрес Вашего ресторана");
+            } else {
+                sendMsg(message, "К Вашему ресторану привязан аккаунт telegram");
             }
-            else {
-                sendMsg(message,"К Вашему ресторану привязан аккаунт telegram");
-            }
-            letmeError=true;
+            letmeError = true;
         }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         //
         if ((takePhone == null) && (address == null) && (DishesonKW == null) && (message.getText().equalsIgnoreCase("стоп") == false)
-                && (message.getText().equalsIgnoreCase("Привет") == false)
-                && (message.getText().contains("/") == false) && (letmeError == false)) {
-            sendMsg(message, "Извините, я вас не понимаю.Для заказа введите ключевое слово или название блюда. Для помощи введите /help");
+                && (message.getText().equalsIgnoreCase("Привет") == false) && (message.getText().contains("/") == false) && (letmeError == false)) {
+            sendMsg(message, "Извините, я вас не понимаю.Для заказа введите ключевое слово или название блюда с указанием ресторана. Для помощи введите /help");
         }
     }
 }
