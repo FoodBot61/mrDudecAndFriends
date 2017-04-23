@@ -236,35 +236,43 @@ public class SimpleBot extends TelegramLongPollingBot {
         }
         try {
             DishName = td.findDish();
-//            for (i = 0; i < DishName.length; i++) {
-//            System.out.print("\n"+DishName[i]);
-//            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         try {
-            String ChecktoErrorQuery = "SELECT dish_name FROM `dish` WHERE dish_name='" + message.getText() + "'";
-            BD.rs = BD.stmt.executeQuery(ChecktoErrorQuery);
-            if (BD.rs.next()) {
-                letmeError = true;
-            } else {
-                letmeError = false;
-            }
+                String[] dish = message.getText().split("из");
+                String ChecktoErrorQuery = "SELECT dish_name FROM `dish` WHERE dish_name='" + dish[0].trim() + "'";
+                BD.rs = BD.stmt.executeQuery(ChecktoErrorQuery);
+                if (BD.rs.next()) {
+                    System.out.print("LOKOK");
+                    letmeError = true;
+                } else {
+                    letmeError = false;
+                }
         } catch (SQLException e1) {
             e1.printStackTrace();
         }
         if (message.getText().contains("Я не хочу ") || (message.getText().contains("я не хочу "))) {
+
             for (i = 0; i < DishName.length; i++) {
-                if ((Dishes.contains(DishName[i])) & (message.getText().equals("Я не хочу " + DishName[i]))) {
-                    String msgText = message.getText().replace("Я не хочу ", "");
-                    String reworkprice = "SELECT price FROM `dish` WHERE dish_name ='" + DishName[i] + "'";
+
+                if ((message.getText().equals("Я не хочу " + DishName[i]))) {
+                    String[] dish = DishName[i].split("из");
+                    String reworkprice = "SELECT price FROM `dish`,`res`,`dishes` WHERE dish_name ='"+dish[0].trim()+"' and res.name='"+dish[1].trim()+"' and res.id=dishes.id_res and dish.id=dishes.id_dish";
                     try {
                         BD.rs = BD.stmt.executeQuery(reworkprice);
                         while (BD.rs.next()) {
-                            Dishes = Dishes.replaceFirst(msgText, "");
+                            Dishes = Dishes.replaceFirst(dish[0] +" из" + dish[1] , "");
                             Price = Price - BD.rs.getInt(1);
-                            sendMsg(message, "Ваш заказ : " + Dishes + " " + "на сумму" + Price + " rub");
-                            TotalPrice = Price;
+                            if(Price<0)
+                            {
+                                Price=0; //при попытке заказать после отрицательной суммы totalprice <0
+                                sendMsg(message,"Сначала закажите блюдо");
+                            }
+                            else {
+                                sendMsg(message, "Ваш заказ :" +"\n"+ Dishes.replace("|","").trim() + " " +"\n"+ "на сумму :" + Price + " rub");
+                                TotalPrice = Price;
+                            }
                         }
                     } catch (SQLException e) {
                         e.printStackTrace();
@@ -273,10 +281,9 @@ public class SimpleBot extends TelegramLongPollingBot {
             }
         } else {
             for (i = 0; i < DishName.length; i++) {
+                System.out.print("\n"+DishName[i]);
                 if ((message.getText().equals(DishName[i]))) {
                     String[] dish = DishName[i].split("из");
-                    System.out.print(dish[0]);
-                    System.out.print(dish[1]);
                     DishQuery = "SELECT dish.id,dish.dish_name,dish.icons,dish.descr_dish,dish.price,dish.ingredient " +
                             "FROM `dish`,`res`,`dishes` where dish_name='" + dish[0].trim() + "'" +
                             " and dishes.id_dish=dish.id and res.id=dishes.id_res and res.name='" + dish[1].trim() + "'";
@@ -286,7 +293,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                             sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n" + "Описание : "
                                     + BD.rs.getString(4) + "\n" + "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Фото : " + BD.rs.getString(3) +
                                     "\n" + "Ресторан : " + dish[1]);
-                            Dishes = BD.rs.getString(2) + " | " + Dishes;
+                            Dishes = dish[0] +" из" + dish[1] +" | " + Dishes;
                             TotalDish = Dishes;
                             Price = BD.rs.getInt(5) + Price;
                             TotalPrice = Price;
@@ -296,7 +303,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                         e.printStackTrace();
                     }
                     sendMsg(message, "Итоговая стоимость = " + TotalPrice + " rub");
-                    sendMsg(message, "Итоговый заказ : " + Dishes);
+                    sendMsg(message, "Итоговый заказ :" +"\n"+ Dishes);
                     forKeyWords = true;
                 }
             }
@@ -329,7 +336,7 @@ public class SimpleBot extends TelegramLongPollingBot {
         forKeyWords = false;
         if (message.getText().equalsIgnoreCase("стоп")) {
             if (Dishes != null && Price != 0) {
-                sendMsg(message, "Ваш заказ : " + Dishes + " " + "на сумму" + TotalPrice + " rub");
+                sendMsg(message, "Ваш заказ : " +"\n"+ Dishes + " " +"\n"+ "на сумму : " + TotalPrice + " rub");
                 Price = 0;
                 Dishes = "";
                 sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
@@ -379,7 +386,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                     sendMsgToRest(message, "Номер заказа " + OrderNumber +
                             "\nАдрес клиента: " + address +
                             "\nТелефон клиента: " + Phone +
-                            "\nЗаказ: " + TotalDish.replace("|", ",") +
+                            "\nЗаказ:\n" + TotalDish.replace("|", "\n") +
                             "\nИтоговая стоимость: " + TotalPrice + " руб");
                     OrderNumber++;
                     for (int k = 0; k < boom.length - 1; k++) {
@@ -458,7 +465,7 @@ public class SimpleBot extends TelegramLongPollingBot {
         }
 
 
-        //
+
         if ((takePhone == null) && (address == null) && (DishesonKW == null) && (message.getText().equalsIgnoreCase("стоп") == false)
                 && (message.getText().equalsIgnoreCase("Привет") == false) && (message.getText().contains("/") == false) && (letmeError == false)) {
             sendMsg(message, "Извините, я вас не понимаю.Для заказа введите ключевое слово или название блюда с указанием ресторана. Для помощи введите /help");
