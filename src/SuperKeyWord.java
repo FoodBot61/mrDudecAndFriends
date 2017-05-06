@@ -31,11 +31,10 @@ public class SuperKeyWord {
             Keyword = Keywords[i];
             String msgText = message.getText();
             if ((msgText.contains("Я не хочу") == false) && (msgText.contains(Keyword))) {
-                String sql = "SELECT dish.dish_name,res.name FROM `key_words`,`dish`,`dishes`,`res` WHERE  word='"+Keyword+"' and dish.id=dishes.id_dish and key_words.id=dishes.id_keyword and res.id=dishes.id_res";
+                String sql = "SELECT DISTINCT dish.dish_name FROM `key_words`,`dish`,`dishes`,`res` WHERE  word='"+Keyword+"' and dish.id=dishes.id_dish and key_words.id=dishes.id_keyword ";// АДРЕС CLIENT
                 BD.rs = BD.stmt.executeQuery(sql);
                 while (BD.rs.next()) {
-                    String dish=BD.rs.getString(1)+" из "+BD.rs.getString(2);
-                    ListofDish.add(dish);
+                    ListofDish.add(BD.rs.getString(1));
                 }
                 Dishes = (String[]) ListofDish.toArray(new String[ListofDish.size()]);
             }

@@ -16,8 +16,8 @@ public class Dish {
         DishQuery = "SELECT DISTINCT dish.dish_name,res.name FROM `dish`,`res`,`dishes` WHERE res.id=dishes.id_res and dish.id=dishes.id_dish";
         BD.rs = BD.stmt.executeQuery(DishQuery);
         while (BD.rs.next()) {
-            String dish=BD.rs.getString(1)+" из "+BD.rs.getString(2);
-            rowValues.add(dish);
+
+            rowValues.add(BD.rs.getString(1));
         }
         ListofDishh = (String[]) rowValues.toArray(new String[rowValues.size()]);
         return ListofDishh;
