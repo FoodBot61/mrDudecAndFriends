@@ -5,7 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.maps.GeoApiContext;
-import com.sun.scenario.effect.impl.prism.PrCropPeer;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.TelegramBotsApi;
@@ -24,6 +23,7 @@ public class SimpleBot extends TelegramLongPollingBot {
     private String DishesonKW[];
     private String[] DishName;
     private String DishQuery;
+    private String TotalDishQuery;
     private boolean forKeyWords;
     private String Dish = " ";
     private GeoApiContext context;
@@ -45,11 +45,16 @@ public class SimpleBot extends TelegramLongPollingBot {
     private int IdDishForLog;
     private String UserIdRestForLog;
     private String DishForLog;
-    private String TotalDishForLog;
-    private int TotalPriceForLog;
+    private String TotalDishForRest;
+    private int TotalPriceForRest;
     private Boolean letmeError;
     int OrderNumber=1;
+    private String TotalDishForLog;
+    private int TotalPriceForOrder;
+    private String TotalDishForOrder;
     //ТЕСТ ПЕРЕМЕННЫЕ
+
+
 
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
@@ -75,7 +80,7 @@ public class SimpleBot extends TelegramLongPollingBot {
     private void sendMsg(Message message, String text) {
         user_id = jsonR.takeUserIdFromMessage(message);
         SendMessage sendMessage = new SendMessage();
-        sendMessage.enableMarkdown(true);
+        sendMessage.enableMarkdown(false);
         sendMessage.setChatId(user_id);
         sendMessage.setText(text);
         try {
@@ -251,30 +256,32 @@ public class SimpleBot extends TelegramLongPollingBot {
                 for (i = 0; i < DishName.length; i++) {
                     if ((Dish.contains(DishName[i])) && (message.getText().equals("Я не хочу " + DishName[i])) || (message.getText().equals("я не хочу " + DishName[i]))) {
                         String msgText = message.getText().replace("Я не хочу ", "");
+                        System.out.print(msgText);
 
                         try {
-                            String DeleteFromOrder="DELETE  FROM `orders` WHERE dish_name='"+msgText+"' and user_id='"+user_id+"' LIMIT 1";
+                            String DeleteFromOrder = "DELETE  FROM `orders` WHERE dish_name='" + msgText + "' and user_id='" + user_id + "' LIMIT 1";
                             BD.stmt.executeUpdate(DeleteFromOrder);
                             try {
                                 String TotalDishQuery = "SELECT dish_name,price FROM `orders` WHERE user_id='" + user_id + "'";
                                 BD.rs = BD.stmt.executeQuery(TotalDishQuery);
                                 while (BD.rs.next()) {
-                                    TotalDish=BD.rs.getString(1)+" \n"+TotalDish;
-                                    TotalPrice=BD.rs.getInt(2)+TotalPrice;
+                                    TotalDish = BD.rs.getString(1) + " \n" + TotalDish;
+                                    TotalPrice = BD.rs.getInt(2) + TotalPrice;
+
 
                                 }
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
 
-
-                                sendMsg(message, "Ваш заказ : " + "\n" + TotalDish + " " + "\n" + "на сумму :" + TotalPrice + " rub");
-
-
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
-                    }
+                            sendMsg(message, "Ваш заказ : " + "\n" + TotalDish + " " + "\n" + "на сумму :" + TotalPrice + " rub");
+                            TotalDish = "";
+                            TotalPrice = 0;
+                        }
+
                 }
             }
         } else {
@@ -288,6 +295,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                                     + BD.rs.getString(4) + "\n" + "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Фото : " + BD.rs.getString(3));
                             Dish = BD.rs.getString(2);
                             Price = BD.rs.getInt(5);
+                            TotalDishForLog ="dish="+BD.rs.getString(2)+"price="+BD.rs.getInt(5)+"id="+BD.rs.getString(1)+"\n"+ TotalDishForLog;
                         }
                     } catch (SQLException e) {
                         e.printStackTrace();
@@ -304,11 +312,10 @@ public class SimpleBot extends TelegramLongPollingBot {
                                 sqlEx.printStackTrace();
                     }
                     try {
-                        String TotalDishQuery = "SELECT dish_name,price FROM `orders` WHERE user_id='" + user_id + "'";
+                       TotalDishQuery = "SELECT dish_name,price FROM `orders` WHERE user_id='" + user_id + "'";
                         BD.rs = BD.stmt.executeQuery(TotalDishQuery);
                         while (BD.rs.next()) {
                             TotalDish=BD.rs.getString(1)+" \n"+TotalDish;
-
                             TotalPrice=BD.rs.getInt(2)+TotalPrice;
 
                         }
@@ -318,11 +325,12 @@ public class SimpleBot extends TelegramLongPollingBot {
                     sendMsg(message, "Итоговая стоимость = " + TotalPrice + " rub");
                     sendMsg(message, "Итоговый заказ : "+"\n" + TotalDish);//приколы с пустыми строками
                     forKeyWords = true;
-                    TotalDishForLog=TotalDish;
-                    TotalPriceForLog=TotalPrice;
+                    TotalDishForRest =TotalDish;
+                    TotalPriceForRest =TotalPrice;
                     TotalDish=" ";
                     TotalPrice=0;
                 }
+
             }
         }
         if (!forKeyWords) {
@@ -347,7 +355,20 @@ public class SimpleBot extends TelegramLongPollingBot {
         forKeyWords = false;
         if (message.getText().equalsIgnoreCase("стоп")) {
             if (Dish != null && Price != 0) {
-                sendMsg(message, "\tВаш заказ :\n" + TotalDishForLog + " " + "\nна сумму :" + TotalPriceForLog + " rub");
+                try {
+                    BD.rs = BD.stmt.executeQuery(TotalDishQuery);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    while (BD.rs.next()) {
+                        TotalDishForOrder =BD.rs.getString(1)+" \n"+TotalDish;
+                        TotalPriceForOrder =BD.rs.getInt(2)+TotalPrice;
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                sendMsg(message, "\tВаш заказ :\n" + TotalDishForOrder + " " + "\nна сумму :" + TotalPriceForOrder + " rub");
                 String DeleteAllFromOrder="DELETE  FROM `orders` WHERE user_id='"+user_id+"'";
                 try {
                     BD.stmt.executeUpdate(DeleteAllFromOrder);
@@ -395,19 +416,21 @@ public class SimpleBot extends TelegramLongPollingBot {
                         e.printStackTrace();
                     }
                     hello(message);
-                    String ta = TotalDishForLog.replace(" |", "-");
+
+                    System.out.println(TotalDishForLog);
+                    String ta = TotalDishForLog.replace("\n", "-");
                     String[] boom = ta.split("-");
                     sendMsgToRest(message,"Номер заказа "+OrderNumber+
                             "\nАдрес клиента: " + address +
                             "\nТелефон клиента: " + Phone +
-                            "\nЗаказ:\n " + TotalDish.trim().replace("|", "\n") +
-                            "\nИтоговая стоимость: " + TotalPrice + " руб");
+                            "\nЗаказ:\n" + TotalDishForRest.trim().replace("|", "\n") +
+                            "\nИтоговая стоимость: " + TotalPriceForRest + " руб");
                     OrderNumber++;
                     for (int k = 0; k < boom.length - 1; k++) {
-                        DishForLog = boom[k].replaceAll("price=+[0-9]+.*", "");
+                        DishForLog = boom[k].replaceAll("dish=","").replaceAll("price=+[0-9]+.*", "");
                         PriceForLog = Integer.valueOf(boom[k].replaceAll("[^0-9]+price=", "").replaceAll("id=+.+", ""));
                         IdDishForLog = Integer.valueOf(boom[k].replaceAll("[\\S\\s]+id=", ""));
-                        TotalDishForLog = "";
+                        TotalDishForRest = "";
 
                         address = null;
                         letmeError = true;
