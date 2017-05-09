@@ -30,8 +30,8 @@ public class SuperKeyWord {
         for (int i = 0; i < ListofKeywords.size(); i++) {
             Keyword = Keywords[i];
             String msgText = message.getText();
-            if ((msgText.contains("Я не хочу") == false) && (msgText.contains(Keyword))) {
-                String sql = "SELECT DISTINCT dish.dish_name FROM `key_words`,`dish`,`dishes`,`res` WHERE  word='"+Keyword+"' and dish.id=dishes.id_dish and key_words.id=dishes.id_keyword ";// АДРЕС CLIENT
+            if ((msgText.contains("Я не хочу") == false) && (msgText.toLowerCase().contains(Keyword))) {
+                String sql = "SELECT DISTINCT dish.dish_name FROM `key_words`,`dish`,`dishes`,`res` WHERE  word='"+Keyword+"' and dish.id=dishes.id_dish and key_words.id=dishes.id_keyword and dish.acs=1";// АДРЕС CLIENT
                 BD.rs = BD.stmt.executeQuery(sql);
                 while (BD.rs.next()) {
                     ListofDish.add(BD.rs.getString(1));
