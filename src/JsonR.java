@@ -130,7 +130,7 @@ public class JsonR {
         return ClosestRest;
     }
 
-    public String takeUserId() throws SQLException {
+    public String takeUserIdRest() throws SQLException {
         String UserIdQuery = "SELECT user_id FROM resbuild WHERE address='" + AdressClosestRest + "'";
         BD.rs = BD.stmt.executeQuery(UserIdQuery);
         while (BD.rs.next()) {

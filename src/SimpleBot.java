@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.regex.Matcher;
@@ -51,8 +50,11 @@ public class SimpleBot extends TelegramLongPollingBot {
     private String TotalDishForLog;
     private int TotalPriceForOrder;
     private String TotalDishForOrder = " ";
-
+    private int userIdFromDB;
     //ТЕСТ ПЕРЕМЕННЫЕ
+
+
+
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
@@ -112,18 +114,50 @@ public class SimpleBot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
     }
-
+public void takeUserIdFromDB(Message message){
+    String takeUserIdQuery="SELECT user_id FROM orders WHERE user_id='"+message.getChatId()+"'";
+    try {
+        BD.rs=BD.stmt.executeQuery(takeUserIdQuery);
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    try {
+        while(BD.rs.next())
+        {
+            userIdFromDB =BD.rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+public void takeOrderForUser(Message message){
+    try {
+        TotalDishQuery = "SELECT dish_name,price FROM orders WHERE user_id='" + message.getChatId()+ "'";
+        BD.rs = BD.stmt.executeQuery(TotalDishQuery);
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    try {
+        while (BD.rs.next()) {
+            TotalDishForOrder = BD.rs.getString(1) + "\n" + TotalDishForOrder;
+            TotalPriceForOrder = BD.rs.getInt(2) + TotalPriceForOrder;
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
     public void getPhoneAndAddress(Message message) {
         if (TotalDish != null) {
             userPhone = getPhoneNumb(message);
             if (message.getText().equals(userPhone)) {
-                sendMsg(message, "Введите улицу, чтобы курьер знал куда ехать ");
+                sendMsg(message, "Введите улицу, чтобы курьер знал куда ехать. Например\n" +
+                        "улица Большая Садовая 12");
                 takePhone = message.getText();
                 Phone = takePhone;
             }
 
         }
-        if ((takePhone != null) & (message.getText().matches("[0-9]{0,4}[^0-9]{0,2}[а-я].+[0-9]{1,4}"))) {
+        if ((takePhone != null) & (message.getText().matches("[0-9]{0,4}[^0-9]{0,2}[а-я].+[0-9]{1,4}.+[А-я]{0,1}"))) {
             context = new GeoApiContext().setApiKey("AIzaSyAg5cKfRFcLIxAUuPSs8IFXX5dnbH844uw");
             address = jsonR.makeURL(message);
             sendMsg(message, address);
@@ -262,37 +296,43 @@ public class SimpleBot extends TelegramLongPollingBot {
             e1.printStackTrace();
         }
         if (message.getText().contains("Я не хочу ") || (message.getText().contains("я не хочу "))) {
-            if (Price == 0) {
-                sendMsg(message, "Вы ничего не заказали");
-            } else {
-                for (i = 0; i < DishName.length; i++) {
-                    if ((Dish.contains(DishName[i])) && (message.getText().equalsIgnoreCase("Я не хочу " + DishName[i]))) {
-                        String msgText = message.getText().replace("Я не хочу ", "");
-                        System.out.print(msgText);
+            takeUserIdFromDB(message);
+            System.out.println(message.getChatId().toString());
+            System.out.println(userIdFromDB);
 
-                        try {
-                            String DeleteFromOrder = "DELETE  FROM `orders` WHERE dish_name='" + msgText + "' and user_id='" + user_id + "' LIMIT 1";
-                            BD.stmt.executeUpdate(DeleteFromOrder);
+            if(message.getChatId()== userIdFromDB) {
+                if (Price == 0) {
+                    sendMsg(message, "Вы ничего не заказали");
+                } else {
+                   takeOrderForUser(message);
+                    for (i = 0; i < DishName.length; i++) {
+
+                        System.out.println(message.getText() + "T1");
+                        System.out.println(Dish + "T12");
+                        System.out.println(TotalDishForOrder + "T13");
+                        if ((TotalDishForOrder.contains(DishName[i])) && (message.getText().equalsIgnoreCase("Я не хочу " + DishName[i]))) {//////////////////// тотал строка с заказом( брать из базы)
+                            System.out.print(message.getText() + "TTTTTTTTTTTTTTTTTTT");
+                            String msgText = message.getText().toLowerCase().replace("я не хочу ", "");
+                            System.out.print(msgText);
+                            TotalDishForOrder="";
+                            TotalPriceForOrder=0;
                             try {
-                                String TotalDishQuery = "SELECT dish_name,price FROM `orders` WHERE user_id='" + user_id + "'";
-                                BD.rs = BD.stmt.executeQuery(TotalDishQuery);
-                                while (BD.rs.next()) {
-                                    TotalDish = BD.rs.getString(1) + " \n" + TotalDish;
-                                    TotalPrice = BD.rs.getInt(2) + TotalPrice;
+                                String DeleteFromOrder = "DELETE  FROM `orders` WHERE dish_name='" + msgText + "' and user_id='" + message.getChatId() + "' LIMIT 1";
+                                BD.stmt.executeUpdate(DeleteFromOrder);
+                                takeOrderForUser(message);
 
-
-                                }
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
-
-                        } catch (SQLException e) {
-                            e.printStackTrace();
                         }
-                        sendMsg(message, "Ваш заказ : " + "\n" + TotalDish + " " + "\n" + "на сумму :" + TotalPrice + " rub");
-                        TotalDish = "";
-                        TotalPrice = 0;
                     }
+                    sendMsg(message, "Ваш заказ : " + "\n" + TotalDishForOrder + " " + "\n" + "на сумму :" + TotalPriceForOrder + " rub");
+                    TotalDishForRest=TotalDishForOrder;
+                    TotalPriceForRest=TotalPriceForOrder;
+                    TotalDishForOrder = "";
+                    TotalPriceForOrder = 0;
+
+
 
                 }
             }
@@ -329,23 +369,13 @@ public class SimpleBot extends TelegramLongPollingBot {
                                 } catch (SQLException sqlEx) {
                                     sqlEx.printStackTrace();
                                 }
-                                try {
-                                    TotalDishQuery = "SELECT dish_name,price FROM `orders` WHERE user_id='" + user_id + "'";
-                                    BD.rs = BD.stmt.executeQuery(TotalDishQuery);
-                                    while (BD.rs.next()) {
-                                        TotalDish = BD.rs.getString(1) + " \n" + TotalDish;
-                                        TotalPrice = BD.rs.getInt(2) + TotalPrice;
-
-                                    }
-                                } catch (SQLException e) {
-                                    e.printStackTrace();
-                                }
-                                sendMsg(message, "Итоговая стоимость = " + TotalPrice + " rub");
-                                sendMsg(message, "Итоговый заказ : " + "\n" + TotalDish);//приколы с пустыми строками
-                                TotalDishForRest = TotalDish;
-                                TotalPriceForRest = TotalPrice;
-                                TotalDish = " ";
-                                TotalPrice = 0;
+                                takeOrderForUser(message);
+                                sendMsg(message, "Итоговая стоимость = " + TotalPriceForOrder + " rub");
+                                sendMsg(message, "Итоговый заказ : " + "\n" + TotalDishForOrder);//приколы с пустыми строками
+                                TotalDishForRest = TotalDishForOrder;
+                                TotalPriceForRest = TotalPriceForOrder;
+                                TotalDishForOrder = " ";
+                                TotalPriceForOrder = 0;
                                 forKeyWords = true;
                             }
 
@@ -378,116 +408,127 @@ public class SimpleBot extends TelegramLongPollingBot {
             }
             forKeyWords = false;
             if (message.getText().equalsIgnoreCase("стоп")) {
-                if (Dish != null && Price != 0) {
-                    try {
-                        BD.rs = BD.stmt.executeQuery(TotalDishQuery);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        while (BD.rs.next()) {
-                            TotalDishForOrder = BD.rs.getString(1) + "\n" + TotalDishForOrder;
-                            TotalPriceForOrder = BD.rs.getInt(2) + TotalPriceForOrder;
+               takeUserIdFromDB(message);
+                System.out.println(message.getChatId().toString());
+                System.out.println(userIdFromDB);
+
+                if(message.getChatId()== userIdFromDB) {
+                    if (Dish != null && Price != 0) {
+                        takeOrderForUser(message);
+                        sendMsg(message, "\tВаш заказ :\n" + TotalDishForOrder + " " + "\nна сумму :" + TotalPriceForOrder + " rub");
+                        String DeleteAllFromOrder = "DELETE  FROM `orders` WHERE user_id='" + message.getChatId() + "'";
+                        try {
+                            BD.stmt.executeUpdate(DeleteAllFromOrder);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
                         }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
+                        TotalDishForOrder = " ";
+                        TotalPriceForOrder = 0;
+                        sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
+                    } else {
+                        sendMsg(message, "Закажите что-нибудь.Надо поесть");
                     }
-                    sendMsg(message, "\tВаш заказ :\n" + TotalDishForOrder + " " + "\nна сумму :" + TotalPriceForOrder + " rub");
-                    String DeleteAllFromOrder = "DELETE  FROM `orders` WHERE user_id='" + user_id + "'";
-                    try {
-                        BD.stmt.executeUpdate(DeleteAllFromOrder);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
-                } else {
-                    sendMsg(message, "Закажите что-нибудь.Надо поесть");
                 }
+                else
+                {sendMsg(message,"fail test");}
+
+            }
+           takeUserIdFromDB(message);
+            System.out.println(message.getChatId().toString());
+            System.out.println(userIdFromDB);
+
+            if(message.getChatId()== userIdFromDB) {
+                getPhoneAndAddress(message);
             }
 
-            getPhoneAndAddress(message);
 
-            if ((takePhone != null) & (address == null) & (message.getText().matches("[0-9]{0,4}[^0-9]{0,2}[а-я].+[0-9]{1,4}") == false)) {
-                sendMsg(message, "Введите адрес по примеру : улица Большая Садовая 1");
-            }
-            if ((takePhone != null) && (address != null)) {
-                String gol = message.getText().toLowerCase();
-                switch (gol) {
-                    case "да":
-                        takePhone = null;
-                        user_id = jsonR.takeUserIdFromMessage(message);
-                        DateForLog = message.getDate();
-                        String LastName = "SELECT last_name FROM user WHERE id='" + user_id + "'";
-                        try {
-                            BD.rs = BD.stmt.executeQuery(LastName);
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            while (BD.rs.next()) {
-                                user_secname = BD.rs.getString(1);
-                            }
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            String closrest = jsonR.chooseClosRest(address);
-                            sendMsg(message, "Номер Вашего заказа :" + OrderNumber + "\nОжидайте Ваш заказ.");
-                            sendMsg(message, closrest);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            userIdRest = jsonR.takeUserId();
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-                        hello(message);
-                        String ta = TotalDishForLog.replace("\n", "-");
-                        String[] boom = ta.split("-");
-                        sendMsgToRest(message, "Номер заказа: " + OrderNumber +
-                                "\nАдрес клиента: " + address +
-                                "\nТелефон клиента: " + Phone +
-                                "\nЗаказ:\n" + TotalDishForRest.trim().replace("|", "\n") +
-                                "\n\nИтоговая стоимость: " + TotalPriceForRest + " руб");
-                        OrderNumber++;
-                        for (int k = 0; k < boom.length - 1; k++) {
-                            DishForLog = boom[k].replaceAll("dish=", "").replaceAll("price=+[0-9]+.*", "");
-                            PriceForLog = Integer.valueOf(boom[k].replaceAll("[^0-9]+price=", "").replaceAll("id=+.+", ""));
-                            IdDishForLog = Integer.valueOf(boom[k].replaceAll("[\\S\\s]+id=", ""));
-                            TotalDishForRest = "";
-                            address = null;
-                            letmeError = true;
+
+           takeUserIdFromDB(message);
+            System.out.println(message.getChatId().toString());
+            System.out.println(userIdFromDB);
+
+            if(message.getChatId()== userIdFromDB) {
+                if ((takePhone != null) && (address != null)) {
+                    String gol = message.getText().toLowerCase();
+                    switch (gol) {
+                        case "да":
+                            takePhone = null;
+                            user_id = jsonR.takeUserIdFromMessage(message);
+                            DateForLog = message.getDate();
+                            String LastName = "SELECT last_name FROM user WHERE id='" + user_id + "'";
                             try {
-                                UserIdRestForLog = jsonR.takeIdRest();
+                                BD.rs = BD.stmt.executeQuery(LastName);
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
-
                             try {
-                                String logvalues = "INSERT INTO log " +
-                                        "SET" +
-                                        " user_id = '" + user_id + "'," +
-                                        " user_name = '" + user_name + "'," +
-                                        " user_secname = '" + user_secname + "', " +
-                                        " `dish` = '" + DishForLog + "'," +
-                                        " `date_msg` = '" + String.valueOf(DateForLog) + "'," +
-                                        " `price` =  '" + PriceForLog + "', " +
-                                        " `id_res` = '" + UserIdRestForLog + "'," +
-                                        " `id_dish` = '" + IdDishForLog + "' ";
-                                BD.stmt.executeUpdate(logvalues);
-                            } catch (SQLException sqlEx) {
-                                sqlEx.printStackTrace();
+                                while (BD.rs.next()) {
+                                    user_secname = BD.rs.getString(1);
+                                }
+                            } catch (SQLException e) {
+                                e.printStackTrace();
                             }
-                        }
-                        break;
-                    case "нет":
-                        sendMsg(message, "\nВведите данные повторно");
-                        sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
-                        getPhoneAndAddress(message);
-                        break;
+                            try {
+                                String closrest = jsonR.chooseClosRest(address);
+                                sendMsg(message, "Номер Вашего заказа :" + OrderNumber + "\nОжидайте Ваш заказ.");
+                                sendMsg(message, closrest);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                userIdRest = jsonR.takeUserIdRest();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                            hello(message);
+
+                            String ta = TotalDishForLog.replace("\n", "-");
+                            String[] boom = ta.split("-");
+                            sendMsgToRest(message, "Номер заказа: " + OrderNumber +
+                                    "\nАдрес клиента: " + address +
+                                    "\nТелефон клиента: " + Phone +
+                                    "\nЗаказ:\n" + TotalDishForRest +
+                                    "\n\nИтоговая стоимость: " + TotalPriceForRest + " руб");
+                            OrderNumber++;
+                            for (int k = 0; k < boom.length - 1; k++) {
+                                DishForLog = boom[k].replaceAll("dish=", "").replaceAll("price=+[0-9]+.*", "");
+                                PriceForLog = Integer.valueOf(boom[k].replaceAll("[^0-9]+price=", "").replaceAll("id=+.+", ""));
+                                IdDishForLog = Integer.valueOf(boom[k].replaceAll("[\\S\\s]+id=", ""));
+                                TotalDishForRest = "";
+                                address = null;
+                                letmeError = true;
+                                try {
+                                    UserIdRestForLog = jsonR.takeIdRest();
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                }
+
+                                try {
+                                    String logvalues = "INSERT INTO log " +
+                                            "SET" +
+                                            " user_id = '" + user_id + "'," +
+                                            " user_name = '" + user_name + "'," +
+                                            " user_secname = '" + user_secname + "', " +
+                                            " `dish` = '" + DishForLog + "'," +
+                                            " `date_msg` = '" + String.valueOf(DateForLog) + "'," +
+                                            " `price` =  '" + PriceForLog + "', " +
+                                            " `id_res` = '" + UserIdRestForLog + "'," +
+                                            " `id_dish` = '" + IdDishForLog + "' ";
+                                    BD.stmt.executeUpdate(logvalues);
+
+                                } catch (SQLException sqlEx) {
+                                    sqlEx.printStackTrace();
+                                }
+                            }
+                            break;
+                        case "нет":
+                            sendMsg(message, "\nВведите данные повторно");
+                            sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
+                            getPhoneAndAddress(message);
+                            break;
+                    }
                 }
             }
 
@@ -536,11 +577,6 @@ public class SimpleBot extends TelegramLongPollingBot {
         }
     }
 }
-
-
-
-
-
 
 
 
