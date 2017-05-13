@@ -28,7 +28,8 @@ import java.util.regex.Pattern;
 /**
  * Created by user on 02.02.2017.
  */
-public class JsonR {
+
+public class JsonR  {
     private String ClientAddress;
     private String RestAddress;
     private double MinDistance;
@@ -80,7 +81,6 @@ public class JsonR {
                 }));
         return paramsUrl;
     }
-
     public String makeURL(Message message) {
         params.put("address", "Ростовская область, Ростов-на-Дону " + message.getText());
         params.put("language", "ru");
@@ -88,9 +88,13 @@ public class JsonR {
         final String url = baseURL + '?' + encode(params);
         try {
             final JSONObject response = JsonR.read(url);
-            JSONObject location = response.getJSONArray("results").getJSONObject(0);
-            ClientAddress = location.getString("formatted_address");
-        } catch (IOException e) {
+            if (response.getJSONArray("results").length() == 0) {
+                ClientAddress = "Такой улицы нет или сервер не отвечает. Введите адрес заново";
+            } else {
+                JSONObject location = response.getJSONArray("results").getJSONObject(0);
+                ClientAddress = location.getString("formatted_address");
+            }
+        }catch (IOException e) {
             e.printStackTrace();
         }
         return ClientAddress;
@@ -157,6 +161,7 @@ public class JsonR {
         }
         return user_id;
     }
+
 }
 
 

@@ -150,23 +150,25 @@ public void takeOrderForUser(Message message){
         if (TotalDish != null) {
             userPhone = getPhoneNumb(message);
             if (message.getText().equals(userPhone)) {
-                sendMsg(message, "Введите улицу, чтобы курьер знал куда ехать. Например\n" +
-                        "улица Большая Садовая 12");
+                sendMsg(message, "Укажите адрес, куда нужно доставить еду.");
                 takePhone = message.getText();
                 Phone = takePhone;
             }
-
         }
-        if ((takePhone != null) & (message.getText().matches("[0-9]{0,4}[^0-9]{0,2}[а-я].+[0-9]{1,4}.+[А-я]{0,1}"))) {
+        if ((takePhone != null) & (message.getText().matches("[0-9]{0,4}[^0-9]{0,2}[а-я].+[0-9]{1,4}[^а-я]{0,1}[А-я]{0,1}"))) {
             context = new GeoApiContext().setApiKey("AIzaSyAg5cKfRFcLIxAUuPSs8IFXX5dnbH844uw");
             address = jsonR.makeURL(message);
             sendMsg(message, address);
-            sendMsg(message, "Ваш телефон :" + takePhone + "\n"
-                    + "Ваш адрес :" + address + "\n"
-                    + "Если данные указаны верно, введите 'Да'\n"
-                    + "В случае ошибки введите 'Нет'");
-
-
+            if(address=="Такой улицы нет или сервер не отвечает. Введите адрес заново")
+            {
+                address = jsonR.makeURL(message);
+            }
+            else {
+                sendMsg(message, "Ваш телефон :" + takePhone + "\n"
+                        + "Ваш адрес :" + address + "\n"
+                        + "Если данные указаны верно, введите 'Да'\n"
+                        + "В случае ошибки введите 'Нет'");
+            }
         }
 
 
@@ -207,6 +209,7 @@ public void takeOrderForUser(Message message){
                             "/start - начало работы с ботом" +
                             "\n/top5 - выводит топ 5 блюд, которые заказывали пользователи" +
                             "\n/help - выводит список команд" +
+                            "\n/clear - очищает заказ" +
                             "\n/favlist - выводит список блюд, которые вы заказывали чаще всего \n\n" +
                             "\t Описание работы с ботом \n\n" +
                             "Для начала заказа введите ключевые слова или названия блюд." +
@@ -218,6 +221,7 @@ public void takeOrderForUser(Message message){
                             "/start - начало работы с ботом" +
                             "\n/top5 - выводит топ 5 блюд, которые заказывали пользователи" +
                             "\n/help - выводит список команд" +
+                            "\n/clear - очищает заказ" +
                             "\n/favlist - выводит список блюд, которые вы заказывали чаще всего \n\n" +
                             "\t Описание работы с ботом \n\n" +
                             "Для начала заказа введите ключевые слова или названия блюд." +
@@ -272,6 +276,14 @@ public void takeOrderForUser(Message message){
                         e.printStackTrace();
                     }
                     break;
+                case "/clear":
+                    String DeleteAllFromOrder = "DELETE  FROM `orders` WHERE user_id='" + message.getChatId() + "'";
+                    try {
+                        BD.stmt.executeUpdate(DeleteAllFromOrder);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    sendMsg(message,"Ваш заказ очищен");
                 default:
                     sendMsg(message, "Нет такой команды. Для полного списка команд используйте /help");
             }
@@ -297,8 +309,7 @@ public void takeOrderForUser(Message message){
         }
         if (message.getText().contains("Я не хочу ") || (message.getText().contains("я не хочу "))) {
             takeUserIdFromDB(message);
-            System.out.println(message.getChatId().toString());
-            System.out.println(userIdFromDB);
+
 
             if(message.getChatId()== userIdFromDB) {
                 if (Price == 0) {
@@ -307,13 +318,10 @@ public void takeOrderForUser(Message message){
                    takeOrderForUser(message);
                     for (i = 0; i < DishName.length; i++) {
 
-                        System.out.println(message.getText() + "T1");
-                        System.out.println(Dish + "T12");
-                        System.out.println(TotalDishForOrder + "T13");
+
                         if ((TotalDishForOrder.contains(DishName[i])) && (message.getText().equalsIgnoreCase("Я не хочу " + DishName[i]))) {//////////////////// тотал строка с заказом( брать из базы)
-                            System.out.print(message.getText() + "TTTTTTTTTTTTTTTTTTT");
                             String msgText = message.getText().toLowerCase().replace("я не хочу ", "");
-                            System.out.print(msgText);
+
                             TotalDishForOrder="";
                             TotalPriceForOrder=0;
                             try {
@@ -409,19 +417,12 @@ public void takeOrderForUser(Message message){
             forKeyWords = false;
             if (message.getText().equalsIgnoreCase("стоп")) {
                takeUserIdFromDB(message);
-                System.out.println(message.getChatId().toString());
-                System.out.println(userIdFromDB);
+
 
                 if(message.getChatId()== userIdFromDB) {
                     if (Dish != null && Price != 0) {
                         takeOrderForUser(message);
                         sendMsg(message, "\tВаш заказ :\n" + TotalDishForOrder + " " + "\nна сумму :" + TotalPriceForOrder + " rub");
-                        String DeleteAllFromOrder = "DELETE  FROM `orders` WHERE user_id='" + message.getChatId() + "'";
-                        try {
-                            BD.stmt.executeUpdate(DeleteAllFromOrder);
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
                         TotalDishForOrder = " ";
                         TotalPriceForOrder = 0;
                         sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
@@ -430,28 +431,31 @@ public void takeOrderForUser(Message message){
                     }
                 }
                 else
-                {sendMsg(message,"fail test");}
+                {sendMsg(message,"Закажите что-нибудь.Надо поесть");}
 
             }
+            userIdFromDB=0;
            takeUserIdFromDB(message);
-            System.out.println(message.getChatId().toString());
+            System.out.println(message.getChatId());
             System.out.println(userIdFromDB);
-
             if(message.getChatId()== userIdFromDB) {
                 getPhoneAndAddress(message);
             }
 
-
-
            takeUserIdFromDB(message);
-            System.out.println(message.getChatId().toString());
-            System.out.println(userIdFromDB);
+
 
             if(message.getChatId()== userIdFromDB) {
                 if ((takePhone != null) && (address != null)) {
                     String gol = message.getText().toLowerCase();
                     switch (gol) {
                         case "да":
+                            String DeleteAllFromOrder = "DELETE  FROM `orders` WHERE user_id='" + message.getChatId() + "'";
+                        try {
+                            BD.stmt.executeUpdate(DeleteAllFromOrder);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
                             takePhone = null;
                             user_id = jsonR.takeUserIdFromMessage(message);
                             DateForLog = message.getDate();
@@ -566,8 +570,6 @@ public void takeOrderForUser(Message message){
                 }
                 letmeError = true;
             }
-
-
             //
             if ((takePhone == null) && (address == null) && (DishesonKW == null) && (message.getText().equalsIgnoreCase("стоп") == false)
                     && (message.getText().equalsIgnoreCase("Привет") == false) && (message.getText().contains("Я не хочу") == false)
