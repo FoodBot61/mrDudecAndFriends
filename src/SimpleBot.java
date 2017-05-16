@@ -146,29 +146,54 @@ public void takeOrderForUser(Message message){
         e.printStackTrace();
     }
 }
-    public void getPhoneAndAddress(Message message) {
+    public void getPhoneAndAddress(Message message) throws SQLException {
+        forKeyWords=true;
         if (TotalDish != null) {
             userPhone = getPhoneNumb(message);
             if (message.getText().equals(userPhone)) {
                 sendMsg(message, "Укажите адрес, куда нужно доставить еду.");
                 takePhone = message.getText();
-                Phone = takePhone;
+                Phone=takePhone;
+                String updatePhone="UPDATE orders SET phone = '"+Phone+"' where user_id='"+message.getChatId()+"'";
+                try {
+                    BD.stmt.executeUpdate(updatePhone);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
         if ((takePhone != null) & (message.getText().matches("[0-9]{0,4}[^0-9]{0,2}[а-я].+[0-9]{1,4}[^а-я]{0,1}[А-я]{0,1}"))) {
             context = new GeoApiContext().setApiKey("AIzaSyAg5cKfRFcLIxAUuPSs8IFXX5dnbH844uw");
             address = jsonR.makeURL(message);
             sendMsg(message, address);
+
             if(address=="Такой улицы нет или сервер не отвечает. Введите адрес заново")
             {
                 address = jsonR.makeURL(message);
             }
             else {
-                sendMsg(message, "Ваш телефон :" + takePhone + "\n"
-                        + "Ваш адрес :" + address + "\n"
+                String updateAddress="UPDATE orders SET address='"+address+"' where user_id='"+message.getChatId()+"'";
+                try {
+                    BD.stmt.executeUpdate(updateAddress);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                String caca1="SELECT address,phone FROM orders where user_id='"+message.getChatId()+"'";
+                try {
+                   BD.rs=BD.stmt.executeQuery(caca1);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                while (BD.rs.next()) {
+                    address=BD.rs.getString(1);
+                    Phone=BD.rs.getString(2);
+                }
+                sendMsg(message, "Ваш телефон :" + Phone + "\n"
+                        + "Ваш адрес :" +address+"\n"
                         + "Если данные указаны верно, введите 'Да'\n"
                         + "В случае ошибки введите 'Нет'");
             }
+            forKeyWords=false;
         }
 
 
@@ -355,7 +380,7 @@ public void takeOrderForUser(Message message){
                                 sendMsg(message, "Сейчас это блюдо не подается");
                                 forKeyWords = true;
                             } else {
-                                DishQuery = "SELECT * FROM `Dish` WHERE dish_name ='" + DishName[i] + "' and acs=1";
+                                DishQuery = "SELECT * FROM `Dish` WHERE dish_name ='" + DishName[i] + "'";
                                 try {
                                     BD.rs = BD.stmt.executeQuery(DishQuery);
                                     while (BD.rs.next()) {
@@ -371,7 +396,8 @@ public void takeOrderForUser(Message message){
                                 try {
                                     String UpdateOrder = "INSERT INTO orders SET" +
                                             " dish_name = '" + Dish + "'," +
-                                            "price ='" + Price + "', user_id ='" + user_id + "'";
+                                            "price ='" + Price + "', user_id ='" + user_id + "'," +
+                                            "address = 'address'," + "phone = 0";
                                     BD.stmt.executeUpdate(UpdateOrder);
 
                                 } catch (SQLException sqlEx) {
@@ -400,7 +426,7 @@ public void takeOrderForUser(Message message){
                     DishesonKW = keyw.findDishKW(message);
                     if (DishesonKW != null) {
                         for (i = 0; i < DishesonKW.length; i++) {
-                            DishQuery = "SELECT * FROM `dish` WHERE dish_name='" + DishesonKW[i] + "' and acs=1";
+                            DishQuery = "SELECT * FROM `dish` WHERE dish_name='" + DishesonKW[i] + "'";
                             sendMsg(message, (i + 1 + ")"));
                             BD.rs = BD.stmt.executeQuery(DishQuery);
                             while (BD.rs.next()) {
@@ -439,7 +465,11 @@ public void takeOrderForUser(Message message){
             System.out.println(message.getChatId());
             System.out.println(userIdFromDB);
             if(message.getChatId()== userIdFromDB) {
-                getPhoneAndAddress(message);
+                try {
+                    getPhoneAndAddress(message);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
 
            takeUserIdFromDB(message);
@@ -521,7 +551,6 @@ public void takeOrderForUser(Message message){
                                             " `id_res` = '" + UserIdRestForLog + "'," +
                                             " `id_dish` = '" + IdDishForLog + "' ";
                                     BD.stmt.executeUpdate(logvalues);
-
                                 } catch (SQLException sqlEx) {
                                     sqlEx.printStackTrace();
                                 }
@@ -530,7 +559,16 @@ public void takeOrderForUser(Message message){
                         case "нет":
                             sendMsg(message, "\nВведите данные повторно");
                             sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
-                            getPhoneAndAddress(message);
+                            takeUserIdFromDB(message);
+                            System.out.println(message.getChatId());
+                            System.out.println(userIdFromDB);
+                            if(message.getChatId()== userIdFromDB) {
+                                try {
+                                    getPhoneAndAddress(message);
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                             break;
                     }
                 }
