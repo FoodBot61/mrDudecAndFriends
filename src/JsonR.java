@@ -81,6 +81,7 @@ public class JsonR  {
                 }));
         return paramsUrl;
     }
+
     public String makeURL(Message message) {
         params.put("address", "Ростовская область, Ростов-на-Дону " + message.getText());
         params.put("language", "ru");
@@ -88,7 +89,7 @@ public class JsonR  {
         final String url = baseURL + '?' + encode(params);
         try {
             final JSONObject response = JsonR.read(url);
-            if (response.getJSONArray("results").length() == 0) {
+            if (response.getJSONArray("results").length() == 0) { //обработка не существующей улицы
                 ClientAddress = "Такой улицы нет или сервер не отвечает. Введите адрес заново";
             } else {
                 JSONObject location = response.getJSONArray("results").getJSONObject(0);
@@ -111,8 +112,9 @@ public class JsonR  {
             RestAddress = BD.rs.getString(1).replace(" ", "_").replace(",", "_");
             String url = new String("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + ClientAddress.replace(" ", "_").replace(",", "_") + "&destinations=" + RestAddress) + encode(params);
             final JSONObject response = JsonR.read(url);
+            //время в пути без учета пробок между рестораном и адресом клиента
             String timebetween2loc = response.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject("duration").getString("text").replace("mins", "").replace("min", "").trim();
-            double TimetoRest = Double.parseDouble(timebetween2loc);
+            double TimetoRest = Double.parseDouble(timebetween2loc)+10;
             Distance.put(RestAddress, TimetoRest);
         }
         Object[] DistanceValues = Distance.values().toArray();
@@ -129,7 +131,7 @@ public class JsonR  {
             }
         }
         AdressClosestRest = ClosestRest.replaceAll("=.[0-9]+\\.+[0-9]", "").replaceAll("=.*", "").replace("_", " ").replace(".  ", "., ");
-        ClosestRest = "Ближайщий ресторан РИС к вам находится на " + ClosestRest.replace("_", " ").replace(".", "").replaceAll("=.+[0-9]{1}$", "") +
+        ClosestRest = "Ближайщий к вам ресторан находится на " + ClosestRest.replace("_", " ").replace(".", "").replaceAll("=.+[0-9]{1}$", "") +
                 "\nПримерное время доставки : " + ClosestRest.replaceAll(".[А-я].+.[0-9].+=", "").replaceAll(".[0-9]{1}$", "") + " мин";
         return ClosestRest;
     }
@@ -138,7 +140,7 @@ public class JsonR  {
         String UserIdQuery = "SELECT user_id FROM resbuild WHERE address='" + AdressClosestRest + "'";
         BD.rs = BD.stmt.executeQuery(UserIdQuery);
         while (BD.rs.next()) {
-            useridformbd = BD.rs.getString(1);
+            useridformbd = BD.rs.getString(1);//id телеграм акка человека, прикрепленного за рестораном
         }
         return useridformbd;
     }
@@ -161,7 +163,6 @@ public class JsonR  {
         }
         return user_id;
     }
-
 }
 
 

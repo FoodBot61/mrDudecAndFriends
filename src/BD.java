@@ -20,17 +20,11 @@ public class BD {
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            System.out.println("Driver loaded!");
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException("Cannot find the driver in the classpath!", e);
         }
         try {
             con = DriverManager.getConnection(URL, USER, PASSWORD);
-            if (con != null) {
-                System.out.println("Лучше бы на повара пошёл");
-            } else {
-                System.out.println("А нет!");
-            }
             stmt = con.createStatement();
         } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();

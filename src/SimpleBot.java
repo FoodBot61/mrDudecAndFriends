@@ -51,9 +51,6 @@ public class SimpleBot extends TelegramLongPollingBot {
     private int TotalPriceForOrder;
     private String TotalDishForOrder = " ";
     private int userIdFromDB;
-    //ТЕСТ ПЕРЕМЕННЫЕ
-
-
 
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
@@ -62,7 +59,6 @@ public class SimpleBot extends TelegramLongPollingBot {
             telegramBotsApi.registerBot(new SimpleBot());
         } catch (TelegramApiException e) {
             e.printStackTrace();
-
         }
     }
 
@@ -97,7 +93,6 @@ public class SimpleBot extends TelegramLongPollingBot {
         Matcher m = p.matcher(msgText);
         if (m.find()) {
             phone = msgText.substring(m.end() - 11, m.end());
-            System.out.print(phone);
         }
         return phone;
     }
@@ -114,7 +109,8 @@ public class SimpleBot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
     }
-public void takeUserIdFromDB(Message message){
+
+public void takeUserIdFromDB(Message message){      //получение id пользователя по id чата телеги
     String takeUserIdQuery="SELECT user_id FROM orders WHERE user_id='"+message.getChatId()+"'";
     try {
         BD.rs=BD.stmt.executeQuery(takeUserIdQuery);
@@ -130,7 +126,8 @@ public void takeUserIdFromDB(Message message){
         e.printStackTrace();
     }
 }
-public void takeOrderForUser(Message message){
+
+public void takeOrderForUser(Message message){ //блюда из общего заказа
     try {
         TotalDishQuery = "SELECT dish_name,price FROM orders WHERE user_id='" + message.getChatId()+ "'";
         BD.rs = BD.stmt.executeQuery(TotalDishQuery);
@@ -146,6 +143,7 @@ public void takeOrderForUser(Message message){
         e.printStackTrace();
     }
 }
+
     public void getPhoneAndAddress(Message message) throws SQLException {
         forKeyWords=true;
         if (TotalDish != null) {
@@ -166,7 +164,6 @@ public void takeOrderForUser(Message message){
             context = new GeoApiContext().setApiKey("AIzaSyAg5cKfRFcLIxAUuPSs8IFXX5dnbH844uw");
             address = jsonR.makeURL(message);
             sendMsg(message, address);
-
             if(address=="Такой улицы нет или сервер не отвечает. Введите адрес заново")
             {
                 address = jsonR.makeURL(message);
@@ -195,8 +192,6 @@ public void takeOrderForUser(Message message){
             }
             forKeyWords=false;
         }
-
-
     }
 
     public void hello(Message message) {
@@ -238,7 +233,7 @@ public void takeOrderForUser(Message message){
                             "\n/favlist - выводит список блюд, которые вы заказывали чаще всего \n\n" +
                             "\t Описание работы с ботом \n\n" +
                             "Для начала заказа введите ключевые слова или названия блюд." +
-                            "Ключевые слова это общее название блюда, например: шаурма, суп (Примечание: вводить ключевые слова необходимо с маленькой буквы)." +
+                            "Ключевые слова это общее название блюда, например: шаурма, суп" +
                             "\nДля того чтобы заверишь заказ введите Стоп.\nЧтобы убрать блюдо из общей корзины введите 'Я не хочу' и название блюда.");
                     break;
                 case "/help":
@@ -249,12 +244,14 @@ public void takeOrderForUser(Message message){
                             "\n/clear - очищает заказ" +
                             "\n/favlist - выводит список блюд, которые вы заказывали чаще всего \n\n" +
                             "\t Описание работы с ботом \n\n" +
-                            "Для начала заказа введите ключевые слова или названия блюд." +
-                            "Ключевые слова это общее название блюда, например: шаурма, суп(Примечание: вводить ключевые слова необходимо с маленькой буквы)." +
-                            "\nДля того чтобы заверишь заказ введите Стоп.\nЧтобы убрать блюдо из общей корзины введите 'Я не хочу' и название блюда." +
-                            "При заказе еды используется Ваш номер мобильного телефона, чтобы курьер мог связаться с Вами. После того, как вы определитесь с заказом " +
-                            ", введете номер мобильного и адрес, куда необходимо доставить заказ, бот автоматически выберет ближайший ресторан. " +
-                            "Будьте внимательны при вводе Ваших данных. После подтверждения адреса и телефона заказ отменить уже нельзя!" + "\n");
+                            "Для начала заказа следуйте инструкции:\n" +
+                            "1 :Введите ключевое слово.Ключевые слова это общее название блюда, например: шаурма, суп\n" +
+                            "2 :Чтобы заказать блюдо из списка введите его точное название, в точности как в списке\n" +
+                            "3 :Для того, чтобы завершить заказ введите Стоп\n" +
+                            "4 :Для связи с вами потребуется Ваш номер мобильного телефона. После завершения заказа, вы не сможете его отменить.\n" +
+                            "5 :Почти последним шагом является ввод Вашего адреса. Если вы ошиблись при вводе, вы сможете изменить данные чуть позже.\n" +
+                            "6 :И после того, как вы все подтвердили вы увидите примерное время Вашего заказа. Ожидайте звонка курьера.\n" +
+                            "Дальнейшее использование чат-бота подтверждает, что Вы согласны на хранение и обработку Вашим персональных данных, если Вы не согласны, пожалуйста выйдите!");
                     break;
                 case "/favlist":
                     String favlistQuery = "SELECT dish_name,COUNT(id_dish) FROM `log` WHERE user_id='" + user_id + "' GROUP BY id_dish ORDER BY COUNT(*) DESC LIMIT 4";
@@ -364,9 +361,6 @@ public void takeOrderForUser(Message message){
                     TotalPriceForRest=TotalPriceForOrder;
                     TotalDishForOrder = "";
                     TotalPriceForOrder = 0;
-
-
-
                 }
             }
         } else {
@@ -461,9 +455,7 @@ public void takeOrderForUser(Message message){
 
             }
             userIdFromDB=0;
-           takeUserIdFromDB(message);
-            System.out.println(message.getChatId());
-            System.out.println(userIdFromDB);
+            takeUserIdFromDB(message);
             if(message.getChatId()== userIdFromDB) {
                 try {
                     getPhoneAndAddress(message);
@@ -538,7 +530,6 @@ public void takeOrderForUser(Message message){
                                 } catch (SQLException e) {
                                     e.printStackTrace();
                                 }
-
                                 try {
                                     String logvalues = "INSERT INTO log " +
                                             "SET" +
@@ -560,8 +551,6 @@ public void takeOrderForUser(Message message){
                             sendMsg(message, "\nВведите данные повторно");
                             sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
                             takeUserIdFromDB(message);
-                            System.out.println(message.getChatId());
-                            System.out.println(userIdFromDB);
                             if(message.getChatId()== userIdFromDB) {
                                 try {
                                     getPhoneAndAddress(message);
@@ -573,11 +562,6 @@ public void takeOrderForUser(Message message){
                     }
                 }
             }
-
-
-            ////////
-
-
             if (message.getText().matches("timeismoney+.*[А-я]+.[0-9]{0,4}")) {
                 Boolean bool = true;
                 Long IdUser = (message.getChatId());
@@ -608,7 +592,6 @@ public void takeOrderForUser(Message message){
                 }
                 letmeError = true;
             }
-            //
             if ((takePhone == null) && (address == null) && (DishesonKW == null) && (message.getText().equalsIgnoreCase("стоп") == false)
                     && (message.getText().equalsIgnoreCase("Привет") == false) && (message.getText().contains("Я не хочу") == false)
                     && (message.getText().contains("/") == false) && (letmeError == false) && (message.getText().contains("я не хочу") == false)) {

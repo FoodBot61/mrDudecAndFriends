@@ -13,11 +13,11 @@ public class Dish {
     private String DishQuery;
 
     public String[] findDish() throws SQLException {
-        DishQuery = "SELECT DISTINCT dish.dish_name,res.name FROM `dish`,`res`,`dishes` WHERE res.id=dishes.id_res and dish.id=dishes.id_dish";
+        DishQuery = "SELECT DISTINCT dish.dish_name,res.name FROM `dish`,`res`,`dishes` " +    //запрос на все блюда
+                "WHERE res.id=dishes.id_res and dish.id=dishes.id_dish";
         BD.rs = BD.stmt.executeQuery(DishQuery);
         while (BD.rs.next()) {
-
-            rowValues.add(BD.rs.getString(1));
+            rowValues.add(BD.rs.getString(1));//list всех блюд
         }
         ListofDishh = (String[]) rowValues.toArray(new String[rowValues.size()]);
         return ListofDishh;
