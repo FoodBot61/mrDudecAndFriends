@@ -254,7 +254,7 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                             "Дальнейшее использование чат-бота подтверждает, что Вы согласны на хранение и обработку Вашим персональных данных, если Вы не согласны, пожалуйста выйдите!");
                     break;
                 case "/favlist":
-                    String favlistQuery = "SELECT dish_name,COUNT(id_dish) FROM `log` WHERE user_id='" + user_id + "' GROUP BY id_dish ORDER BY COUNT(*) DESC LIMIT 4";
+                    String favlistQuery = "SELECT dish,COUNT(id_dish) FROM `log` WHERE user_id='" + user_id + "' GROUP BY id_dish ORDER BY COUNT(*) DESC LIMIT 4";
                     try {
                         int number = 1;
                         char end = ' ';
@@ -306,6 +306,7 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                         e.printStackTrace();
                     }
                     sendMsg(message,"Ваш заказ очищен");
+                    break;
                 default:
                     sendMsg(message, "Нет такой команды. Для полного списка команд используйте /help");
             }
@@ -329,10 +330,8 @@ public void takeOrderForUser(Message message){ //блюда из общего з
         } catch (SQLException e1) {
             e1.printStackTrace();
         }
-        if (message.getText().contains("Я не хочу ") || (message.getText().contains("я не хочу "))) {
+        if (message.getText().contains("Я не хочу ") || (message.getText().contains("я не хочу "))|| (message.getText().contains("Я НЕ ХОЧУ "))) {
             takeUserIdFromDB(message);
-
-
             if(message.getChatId()== userIdFromDB) {
                 if (Price == 0) {
                     sendMsg(message, "Вы ничего не заказали");
@@ -370,11 +369,7 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                     try {
                         BD.rs = BD.stmt.executeQuery(sdf);
                         while (BD.rs.next()) {
-                            if (BD.rs.getInt(7) == 0) {
-                                sendMsg(message, "Сейчас это блюдо не подается");
-                                forKeyWords = true;
-                            } else {
-                                DishQuery = "SELECT * FROM `Dish` WHERE dish_name ='" + DishName[i] + "'";
+                            DishQuery = "SELECT * FROM `Dish` WHERE dish_name ='" + DishName[i] + "'";
                                 try {
                                     BD.rs = BD.stmt.executeQuery(DishQuery);
                                     while (BD.rs.next()) {
@@ -406,13 +401,9 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                                 TotalPriceForOrder = 0;
                                 forKeyWords = true;
                             }
-
-                        }
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-
-
                 }
             }
             if (!forKeyWords) {
@@ -592,6 +583,7 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                 }
                 letmeError = true;
             }
+            forKeyWords=false;
             if ((takePhone == null) && (address == null) && (DishesonKW == null) && (message.getText().equalsIgnoreCase("стоп") == false)
                     && (message.getText().equalsIgnoreCase("Привет") == false) && (message.getText().contains("Я не хочу") == false)
                     && (message.getText().contains("/") == false) && (letmeError == false) && (message.getText().contains("я не хочу") == false)) {
