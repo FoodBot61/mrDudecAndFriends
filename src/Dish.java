@@ -17,7 +17,7 @@ public class Dish {
                 "WHERE res.id=dishes.id_res and dish.id=dishes.id_dish";
         BD.rs = BD.stmt.executeQuery(DishQuery);
         while (BD.rs.next()) {
-            rowValues.add(BD.rs.getString(1));//list всех блюд
+            rowValues.add(BD.rs.getString(1)+" из "+BD.rs.getString(2));//list всех блюд
         }
         ListofDishh = (String[]) rowValues.toArray(new String[rowValues.size()]);
         return ListofDishh;

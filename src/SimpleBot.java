@@ -1,5 +1,8 @@
+import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,7 +46,7 @@ public class SimpleBot extends TelegramLongPollingBot {
     private int IdDishForLog;
     private String UserIdRestForLog;
     private String DishForLog;
-    private String TotalDishForRest;
+    private String TotalDishForRest=" ";
     private int TotalPriceForRest;
     private Boolean letmeError;
     int OrderNumber = 1;
@@ -51,6 +54,15 @@ public class SimpleBot extends TelegramLongPollingBot {
     private int TotalPriceForOrder;
     private String TotalDishForOrder = " ";
     private int userIdFromDB;
+//TEST VAR
+String[] RestIds;
+    int IdRest;
+    List ListOfIds= new ArrayList();
+    long cxacaca;
+    String LoginsQuery;
+    String[]logins;
+    private List ListOfLogins=new ArrayList();
+
 
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
@@ -97,7 +109,7 @@ public class SimpleBot extends TelegramLongPollingBot {
         return phone;
     }
 
-    private void sendMsgToRest(Message message, String text) {
+    private void sendMsgToRest(Message message, String text,long userIdRest) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(false);
         sendMessage.setChatId(userIdRest);
@@ -319,18 +331,11 @@ public void takeOrderForUser(Message message){ //блюда из общего з
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        try {
-            String ChecktoErrorQuery = "SELECT dish_name FROM `dish` WHERE dish_name='" + message.getText() + "'";
-            BD.rs = BD.stmt.executeQuery(ChecktoErrorQuery);
-            if (BD.rs.next()) {
-                letmeError = true;
-            } else {
+
                 letmeError = false;
-            }
-        } catch (SQLException e1) {
-            e1.printStackTrace();
-        }
+
         if (message.getText().contains("Я не хочу ") || (message.getText().contains("я не хочу "))|| (message.getText().contains("Я НЕ ХОЧУ "))) {
+            letmeError=true;
             takeUserIdFromDB(message);
             if(message.getChatId()== userIdFromDB) {
                 if (Price == 0) {
@@ -356,8 +361,7 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                         }
                     }
                     sendMsg(message, "Ваш заказ : " + "\n" + TotalDishForOrder + " " + "\n" + "на сумму :" + TotalPriceForOrder + " rub");
-                    TotalDishForRest=TotalDishForOrder;
-                    TotalPriceForRest=TotalPriceForOrder;
+
                     TotalDishForOrder = "";
                     TotalPriceForOrder = 0;
                 }
@@ -365,57 +369,78 @@ public void takeOrderForUser(Message message){ //блюда из общего з
         } else {
             for (i = 0; i < DishName.length; i++) {
                 if ((message.getText().equalsIgnoreCase(DishName[i]))) {
-                    String sdf = "SELECT * FROM `Dish` WHERE dish_name ='" + DishName[i] + "'";
+                    letmeError=true;
+
+                    String[] dish = DishName[i].split(" из ");
+
+                    String sdf = "SELECT * FROM `Dish` WHERE dish_name ='" + dish[0] + "'";
                     try {
                         BD.rs = BD.stmt.executeQuery(sdf);
+
                         while (BD.rs.next()) {
-                            DishQuery = "SELECT * FROM `Dish` WHERE dish_name ='" + DishName[i] + "'";
-                                try {
-                                    BD.rs = BD.stmt.executeQuery(DishQuery);
-                                    while (BD.rs.next()) {
-                                        sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n" + "Описание : "
+                            DishQuery = "SELECT dish.id,dish.dish_name,dish.icons,dish.descr_dish,dish.price,dish.ingredient,res.name,res.id,dishes.acs " +
+                                    "FROM `dish`,`res`,`dishes` where dish_name='" + dish[0].trim() + "'" +
+                                    " and dishes.id_dish=dish.id and res.id=dishes.id_res and res.name='" + dish[1].trim() + "'";
+                            try {
+                                BD.rs = BD.stmt.executeQuery(DishQuery);
+                                while (BD.rs.next()) {
+                                    if (BD.rs.getInt(9) == 0) {
+                                        sendMsg(message, "Это блюдо сейчас не подается");
+                                        forKeyWords = true;
+                                    } else {
+                                        sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n"
+                                                + "Ресторан : " + BD.rs.getString(7) + "\n" + "Описание : "
                                                 + BD.rs.getString(4) + "\n" + "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Фото : " + BD.rs.getString(3));
-                                        Dish = BD.rs.getString(2);
+                                        Dish = DishName[i];
                                         Price = BD.rs.getInt(5);
+                                        IdRest = BD.rs.getInt(8);
                                         TotalDishForLog = "dish=" + BD.rs.getString(2) + "price=" + BD.rs.getInt(5) + "id=" + BD.rs.getString(1) + "\n" + TotalDishForLog;
+                                        try {
+                                            String UpdateOrder = "INSERT INTO orders SET" +
+                                                    " dish_name = '" + Dish + "'," +
+                                                    "price ='" + Price + "', user_id ='" + user_id + "'," +
+                                                    "id_res = '" + IdRest + "'," +
+                                                    "address = 'address'," + "phone = 0";
+                                            BD.stmt.executeUpdate(UpdateOrder);
+                                            takeOrderForUser(message);
+                                            sendMsg(message, "Итоговая стоимость = " + TotalPriceForOrder + " rub");
+                                            sendMsg(message, "Итоговый заказ : " + "\n" + TotalDishForOrder);//приколы с пустыми строками
+                                            TotalDishForOrder = " ";
+                                            TotalPriceForOrder = 0;
+                                            forKeyWords = true;
+                                        } catch (SQLException sqlEx) {
+                                            sqlEx.printStackTrace();
+                                        }
                                     }
-                                } catch (SQLException e) {
+                                }
+
+                                } catch(SQLException e){
                                     e.printStackTrace();
                                 }
-                                try {
-                                    String UpdateOrder = "INSERT INTO orders SET" +
-                                            " dish_name = '" + Dish + "'," +
-                                            "price ='" + Price + "', user_id ='" + user_id + "'," +
-                                            "address = 'address'," + "phone = 0";
-                                    BD.stmt.executeUpdate(UpdateOrder);
-
-                                } catch (SQLException sqlEx) {
-                                    sqlEx.printStackTrace();
-                                }
-                                takeOrderForUser(message);
-                                sendMsg(message, "Итоговая стоимость = " + TotalPriceForOrder + " rub");
-                                sendMsg(message, "Итоговый заказ : " + "\n" + TotalDishForOrder);//приколы с пустыми строками
-                                TotalDishForRest = TotalDishForOrder;
-                                TotalPriceForRest = TotalPriceForOrder;
-                                TotalDishForOrder = " ";
-                                TotalPriceForOrder = 0;
-                                forKeyWords = true;
                             }
+
+
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
                 }
             }
+
             if (!forKeyWords) {
                 try {
                     DishesonKW = keyw.findDishKW(message);
                     if (DishesonKW != null) {
                         for (i = 0; i < DishesonKW.length; i++) {
-                            DishQuery = "SELECT * FROM `dish` WHERE dish_name='" + DishesonKW[i] + "'";
+
+                            String[] dish = DishesonKW[i].split(" из ");
+                            DishQuery = "SELECT dish.id,dish.dish_name,dish.icons,dish.descr_dish,dish.price,dish.ingredient,res.name FROM `dish`,`res`,`dishes`,`key_words` " +
+                                    "where dishes.id_dish=dish.id and res.id=dishes.id_res and key_words.id=dishes.id_keyword " +
+                                    "and dish.dish_name='" + dish[0].trim() + "' and res.name='" + dish[1].trim() + "'";
                             sendMsg(message, (i + 1 + ")"));
                             BD.rs = BD.stmt.executeQuery(DishQuery);
                             while (BD.rs.next()) {
-                                sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n" + "Описание : " + BD.rs.getString(4) + "\n" +
+                                sendMsg(message, "\n" + "\n" + "\n" + "Название : " + BD.rs.getString(2) + "\n"
+                                        + "Ресторан : " + BD.rs.getString(7) + "\n" + "Описание : " + BD.rs.getString(4) + "\n" +
                                         "Цена :" + BD.rs.getInt(5) + " rub " + "\n" + "Ингридиенты  :" + BD.rs.getString(6) + "\n" + "Фото : " + BD.rs.getString(3));
                             }
                         }
@@ -428,8 +453,6 @@ public void takeOrderForUser(Message message){ //блюда из общего з
             forKeyWords = false;
             if (message.getText().equalsIgnoreCase("стоп")) {
                takeUserIdFromDB(message);
-
-
                 if(message.getChatId()== userIdFromDB) {
                     if (Dish != null && Price != 0) {
                         takeOrderForUser(message);
@@ -463,12 +486,6 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                     String gol = message.getText().toLowerCase();
                     switch (gol) {
                         case "да":
-                            String DeleteAllFromOrder = "DELETE  FROM `orders` WHERE user_id='" + message.getChatId() + "'";
-                        try {
-                            BD.stmt.executeUpdate(DeleteAllFromOrder);
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
                             takePhone = null;
                             user_id = jsonR.takeUserIdFromMessage(message);
                             DateForLog = message.getDate();
@@ -485,15 +502,7 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
-                            try {
-                                String closrest = jsonR.chooseClosRest(address);
-                                sendMsg(message, "Номер Вашего заказа :" + OrderNumber + "\nОжидайте Ваш заказ.");
-                                sendMsg(message, closrest);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
+
                             try {
                                 userIdRest = jsonR.takeUserIdRest();
                             } catch (SQLException e) {
@@ -503,12 +512,70 @@ public void takeOrderForUser(Message message){ //блюда из общего з
 
                             String ta = TotalDishForLog.replace("\n", "-");
                             String[] boom = ta.split("-");
-                            sendMsgToRest(message, "Номер заказа: " + OrderNumber +
-                                    "\nАдрес клиента: " + address +
-                                    "\nТелефон клиента: " + Phone +
-                                    "\nЗаказ:\n" + TotalDishForRest +
-                                    "\n\nИтоговая стоимость: " + TotalPriceForRest + " руб");
+                            sendMsg(message, "Номер Вашего заказа :" + OrderNumber + "\nОжидайте Ваш заказ.");
+                            ///////////////////////////////
+                            String CACACACACQuery="SELECT DISTINCT id_res FROM `orders` WHERE user_id='"+message.getChatId()+"'";
+                            try {
+                                BD.rs = BD.stmt.executeQuery(CACACACACQuery);
+                                while (BD.rs.next()) {
+                                    ListOfIds.add(BD.rs.getString(1));
+                                }
+                                RestIds = (String[]) ListOfIds.toArray(new String[ListOfIds.size()]);
+                                    for (i = 0; i < RestIds.length; i++) {
+                                        String SFSDFQuery = "SELECT DISTINCT orders.address,orders.dish_name, orders.price,orders.phone,resbuild.user_id,orders.id " +
+                                                "FROM `orders`,`resbuild` WHERE orders.user_id='" + message.getChatId() + "' and resbuild.id_res=orders.id_res and orders.id_res='" + RestIds[i] + "'";
+                                        try {
+                                            BD.rs = BD.stmt.executeQuery(SFSDFQuery);
+                                            while (BD.rs.next()) {
+                                                TotalDishForRest=BD.rs.getString(2)+"\n"+TotalDishForRest;
+                                                TotalPriceForRest=BD.rs.getInt(3)+TotalPriceForRest;
+                                        cxacaca=BD.rs.getLong(5);
+
+                                            }
+                                            sendMsgToRest(message, "Номер заказа: " + OrderNumber +
+                                                    "\nАдрес клиента: " +  address +
+                                                    "\nТелефон клиента: " + Phone +
+                                                    "\nЗаказ:\n" + TotalDishForRest +
+                                                    "\n\nИтоговая стоимость: " + TotalPriceForRest + " руб",cxacaca);
+                                            TotalDishForRest=" ";
+                                            TotalPriceForRest=0;
+                                        } catch (SQLException e) {
+                                            e.printStackTrace();
+                                        }
+                                        try {
+                                            String closrest = jsonR.chooseClosRest(address,RestIds[i]);
+                                            sendMsg(message, closrest);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        } catch (SQLException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+
+                            } catch(SQLException e){
+                        e.printStackTrace();
+                    }
+
+
                             OrderNumber++;
+
+
+
+
+
+
+
+
+
+
+
+                            ////////////////
+                            String DeleteAllFromOrder = "DELETE  FROM `orders` WHERE user_id='" + message.getChatId() + "'";
+                            try {
+                                BD.stmt.executeUpdate(DeleteAllFromOrder);
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
                             for (int k = 0; k < boom.length - 1; k++) {
                                 DishForLog = boom[k].replaceAll("dish=", "").replaceAll("price=+[0-9]+.*", "");
                                 PriceForLog = Integer.valueOf(boom[k].replaceAll("[^0-9]+price=", "").replaceAll("id=+.+", ""));
@@ -553,35 +620,50 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                     }
                 }
             }
-            if (message.getText().matches("timeismoney+.*[А-я]+.[0-9]{0,4}")) {
-                Boolean bool = true;
-                Long IdUser = (message.getChatId());
-                String Address = message.getText().substring(12).trim();
-                String UserFromRest = "SELECT DISTINCT resbuild.address FROM `user`,`res`,`resbuild`";
-                try {
-                    BD.rs = BD.stmt.executeQuery(UserFromRest);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            LoginsQuery="SELECT login FROM res";
+            try {
+                BD.rs=BD.stmt.executeQuery(LoginsQuery);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            try {
+                while(BD.rs.next())
+                {
+
+                    ListOfLogins.add(BD.rs.getString(1));
+
                 }
-                try {
-                    while (BD.rs.next()) {
-                        if (Address.equals(BD.rs.getString(1))) {
-                            String AddIdUserQuery = "UPDATE resbuild SET resbuild.user_id='" + IdUser + "' WHERE resbuild.address='" + Address + "'";
-                            BD.stmt.executeUpdate(AddIdUserQuery);
-                            bool = true;
-                        } else {
-                            bool = false;
-                        }
+                logins=(String[]) ListOfLogins.toArray(new String[ListOfLogins.size()]);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            for(i=0;i<ListOfLogins.size();i++) {
+                if (message.getText().equals("Time is money "+ logins[i])) {
+                    Boolean bool = true;
+                    Long IdUser = (message.getChatId());
+                    String UserFromRest = "SELECT DISTINCT res.login FROM `res`";
+                    try {
+                        BD.rs = BD.stmt.executeQuery(UserFromRest);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
                     }
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                    try {
+                        String AddIdUserQuery = "UPDATE resbuild,res SET resbuild.user_id='" + IdUser + "' WHERE resbuild.id_res=res.id " +
+                                "and res.login='"+logins[i]+"'";
+                        BD.stmt.executeUpdate(AddIdUserQuery);
+                        bool = true;
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (!bool) {
+                        sendMsg(message, "Введите секретное слово и логин Вашего ресторана");
+                    } else {
+                        sendMsg(message, "К Вашему ресторану привязан аккаунт telegram");
+                    }
+                    letmeError = true;
                 }
-                if (!bool) {
-                    sendMsg(message, "Введите секретное слово и адрес Вашего ресторана");
-                } else {
-                    sendMsg(message, "К Вашему ресторану привязан аккаунт telegram");
-                }
-                letmeError = true;
             }
             forKeyWords=false;
             if ((takePhone == null) && (address == null) && (DishesonKW == null) && (message.getText().equalsIgnoreCase("стоп") == false)

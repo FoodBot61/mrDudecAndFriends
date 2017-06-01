@@ -30,12 +30,13 @@ public class SuperKeyWord {
             Keyword = Keywords[i];
             String msgText = message.getText();
             if ((msgText.contains("Я не хочу") == false) && (msgText.toLowerCase().contains(Keyword))) {
-                String sql = "SELECT DISTINCT dish.dish_name FROM `key_words`,`dish`,`dishes`,`res`" +
-                        " WHERE  word='"+Keyword+"' and dish.id=dishes.id_dish and key_words.id=dishes.id_keyword";
-                BD.rs = BD.stmt.executeQuery(sql);
-                while (BD.rs.next()) {
-                    ListofDish.add(BD.rs.getString(1));//list всех блюд по ключ слову
-                }
+                String sql = "SELECT dish.dish_name,res.name FROM `key_words`,`dish`,`dishes`,`res` WHERE  word='"+Keyword+"'" +
+                        " and dish.id=dishes.id_dish and key_words.id=dishes.id_keyword and res.id=dishes.id_res and dishes.acs=1";
+                                       BD.rs = BD.stmt.executeQuery(sql);
+                                        while (BD.rs.next()) {
+                                            String dish=BD.rs.getString(1)+" из "+BD.rs.getString(2);
+                                            ListofDish.add(dish);
+                                        }
                 Dishes = (String[]) ListofDish.toArray(new String[ListofDish.size()]);
             }
         }
