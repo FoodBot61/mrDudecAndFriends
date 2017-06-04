@@ -1,19 +1,18 @@
-import java.awt.*;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.google.maps.GeoApiContext;
 import org.telegram.telegrambots.ApiContextInitializer;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.exceptions.TelegramApiException;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by User on 08.01.2017.
@@ -21,6 +20,14 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 
 
 public class SimpleBot extends TelegramLongPollingBot {
+    int OrderNumber = 1;
+    String[] RestIds;
+    int IdRest;
+    List ListOfIds = new ArrayList();
+    long UserFromRestID;
+    String LoginsQuery;
+    String[] logins;
+    String closrest;
     private int i;
     private String DishesonKW[];
     private String[] DishName;
@@ -35,9 +42,7 @@ public class SimpleBot extends TelegramLongPollingBot {
     private String Phone;
     private String address;
     private String TotalDish = " ";
-    private int TotalPrice;
     private JsonR jsonR;
-    private String userIdRest;
     private String user_name;
     private String user_secname;
     private String user_id;
@@ -46,23 +51,14 @@ public class SimpleBot extends TelegramLongPollingBot {
     private int IdDishForLog;
     private String UserIdRestForLog;
     private String DishForLog;
-    private String TotalDishForRest=" ";
+    private String TotalDishForRest = " ";
     private int TotalPriceForRest;
     private Boolean letmeError;
-    int OrderNumber = 1;
     private String TotalDishForLog;
     private int TotalPriceForOrder;
     private String TotalDishForOrder = " ";
     private int userIdFromDB;
-//TEST VAR
-String[] RestIds;
-    int IdRest;
-    List ListOfIds= new ArrayList();
-    long cxacaca;
-    String LoginsQuery;
-    String[]logins;
-    private List ListOfLogins=new ArrayList();
-
+    private List ListOfLogins = new ArrayList();
 
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
@@ -109,7 +105,7 @@ String[] RestIds;
         return phone;
     }
 
-    private void sendMsgToRest(Message message, String text,long userIdRest) {
+    private void sendMsgToRest(Message message, String text, long userIdRest) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(false);
         sendMessage.setChatId(userIdRest);
@@ -122,49 +118,48 @@ String[] RestIds;
         }
     }
 
-public void takeUserIdFromDB(Message message){      //получение id пользователя по id чата телеги
-    String takeUserIdQuery="SELECT user_id FROM orders WHERE user_id='"+message.getChatId()+"'";
-    try {
-        BD.rs=BD.stmt.executeQuery(takeUserIdQuery);
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    try {
-        while(BD.rs.next())
-        {
-            userIdFromDB =BD.rs.getInt(1);
+    public void takeUserIdFromDB(Message message) {      //получение id пользователя по id чата телеги
+        String takeUserIdQuery = "SELECT user_id FROM orders WHERE user_id='" + message.getChatId() + "'";
+        try {
+            BD.rs = BD.stmt.executeQuery(takeUserIdQuery);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        try {
+            while (BD.rs.next()) {
+                userIdFromDB = BD.rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
-}
 
-public void takeOrderForUser(Message message){ //блюда из общего заказа
-    try {
-        TotalDishQuery = "SELECT dish_name,price FROM orders WHERE user_id='" + message.getChatId()+ "'";
-        BD.rs = BD.stmt.executeQuery(TotalDishQuery);
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-    try {
-        while (BD.rs.next()) {
-            TotalDishForOrder = BD.rs.getString(1) + "\n" + TotalDishForOrder;
-            TotalPriceForOrder = BD.rs.getInt(2) + TotalPriceForOrder;
+    public void takeOrderForUser(Message message) { //блюда из общего заказа
+        try {
+            TotalDishQuery = "SELECT dish_name,price FROM orders WHERE user_id='" + message.getChatId() + "'";
+            BD.rs = BD.stmt.executeQuery(TotalDishQuery);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        try {
+            while (BD.rs.next()) {
+                TotalDishForOrder = BD.rs.getString(1) + "\n" + TotalDishForOrder;
+                TotalPriceForOrder = BD.rs.getInt(2) + TotalPriceForOrder;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
-}
 
     public void getPhoneAndAddress(Message message) throws SQLException {
-        forKeyWords=true;
+        forKeyWords = true;
         if (TotalDish != null) {
             userPhone = getPhoneNumb(message);
             if (message.getText().equals(userPhone)) {
                 sendMsg(message, "Укажите адрес, куда нужно доставить еду.");
                 takePhone = message.getText();
-                Phone=takePhone;
-                String updatePhone="UPDATE orders SET phone = '"+Phone+"' where user_id='"+message.getChatId()+"'";
+                Phone = takePhone;
+                String updatePhone = "UPDATE orders SET phone = '" + Phone + "' where user_id='" + message.getChatId() + "'";
                 try {
                     BD.stmt.executeUpdate(updatePhone);
                 } catch (SQLException e) {
@@ -176,33 +171,31 @@ public void takeOrderForUser(Message message){ //блюда из общего з
             context = new GeoApiContext().setApiKey("AIzaSyAg5cKfRFcLIxAUuPSs8IFXX5dnbH844uw");
             address = jsonR.makeURL(message);
             sendMsg(message, address);
-            if(address=="Такой улицы нет или сервер не отвечает. Введите адрес заново")
-            {
+            if (address == "Такой улицы нет или сервер не отвечает. Введите адрес заново") {
                 address = jsonR.makeURL(message);
-            }
-            else {
-                String updateAddress="UPDATE orders SET address='"+address+"' where user_id='"+message.getChatId()+"'";
+            } else {
+                String updateAddress = "UPDATE orders SET address='" + address + "' where user_id='" + message.getChatId() + "'";
                 try {
                     BD.stmt.executeUpdate(updateAddress);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                String caca1="SELECT address,phone FROM orders where user_id='"+message.getChatId()+"'";
+                String caca1 = "SELECT address,phone FROM orders where user_id='" + message.getChatId() + "'";
                 try {
-                   BD.rs=BD.stmt.executeQuery(caca1);
+                    BD.rs = BD.stmt.executeQuery(caca1);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
                 while (BD.rs.next()) {
-                    address=BD.rs.getString(1);
-                    Phone=BD.rs.getString(2);
+                    address = BD.rs.getString(1);
+                    Phone = BD.rs.getString(2);
                 }
                 sendMsg(message, "Ваш телефон :" + Phone + "\n"
-                        + "Ваш адрес :" +address+"\n"
+                        + "Ваш адрес :" + address + "\n"
                         + "Если данные указаны верно, введите 'Да'\n"
                         + "В случае ошибки введите 'Нет'");
             }
-            forKeyWords=false;
+            forKeyWords = false;
         }
     }
 
@@ -243,10 +236,7 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                             "\n/help - выводит список команд" +
                             "\n/clear - очищает заказ" +
                             "\n/favlist - выводит список блюд, которые вы заказывали чаще всего \n\n" +
-                            "\t Описание работы с ботом \n\n" +
-                            "Для начала заказа введите ключевые слова или названия блюд." +
-                            "Ключевые слова это общее название блюда, например: шаурма, суп" +
-                            "\nДля того чтобы заверишь заказ введите Стоп.\nЧтобы убрать блюдо из общей корзины введите 'Я не хочу' и название блюда.");
+                            "\t Описание работы с ботом представлено в команде /help\n\n");
                     break;
                 case "/help":
                     sendMsg(message, "Доступные команды:  \n\n" +
@@ -258,11 +248,14 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                             "\t Описание работы с ботом \n\n" +
                             "Для начала заказа следуйте инструкции:\n" +
                             "1 :Введите ключевое слово.Ключевые слова это общее название блюда, например: шаурма, суп\n" +
-                            "2 :Чтобы заказать блюдо из списка введите его точное название, в точности как в списке\n" +
-                            "3 :Для того, чтобы завершить заказ введите Стоп\n" +
-                            "4 :Для связи с вами потребуется Ваш номер мобильного телефона. После завершения заказа, вы не сможете его отменить.\n" +
-                            "5 :Почти последним шагом является ввод Вашего адреса. Если вы ошиблись при вводе, вы сможете изменить данные чуть позже.\n" +
-                            "6 :И после того, как вы все подтвердили вы увидите примерное время Вашего заказа. Ожидайте звонка курьера.\n" +
+                            "2 :Чтобы заказать блюдо из списка введите '\nНазвание блюда и з Название ресторана'\n.Названия блюд и ресторанов в точности как в списке\n" +
+                            "Например: Суп и з Ресторан\n" +
+                            "3 :Если необходимо вычеркнуть блюдо из общего заказа, введите Я не хочу Название Блюда и з Название ресторана\n"+
+                            "Например: Я не хочу Суп и з Ресторан\n"+
+                            "4 :Для того, чтобы завершить заказ введите Стоп\n" +
+                            "5 :Для связи с вами потребуется Ваш номер мобильного телефона. После завершения заказа, вы не сможете его отменить.\n" +
+                            "6 :Почти последним шагом является ввод Вашего адреса. Если вы ошиблись при вводе, вы сможете изменить данные чуть позже.\n" +
+                            "7 :И после того, как вы все подтвердили вы увидите примерное время Вашего заказа. Ожидайте звонка курьера.\n" +
                             "Дальнейшее использование чат-бота подтверждает, что Вы согласны на хранение и обработку Вашим персональных данных, если Вы не согласны, пожалуйста выйдите!");
                     break;
                 case "/favlist":
@@ -276,7 +269,6 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                             sendMsg(message, "Вы ничего не  заказывали");
                         } else {
                             BD.rs.beforeFirst();
-
                             while (BD.rs.next()) {
                                 for (i = 5; i < 21; i++) {
                                     if ((BD.rs.getInt(2) == i) && (String.valueOf(BD.rs.getInt(2)).endsWith("1")) && (String.valueOf(BD.rs.getInt(2)).endsWith("6")) && (String.valueOf(BD.rs.getInt(2)).endsWith("7")) && (String.valueOf(BD.rs.getInt(2)).endsWith("8")) && (String.valueOf(BD.rs.getInt(2)).endsWith("9"))) {
@@ -317,7 +309,7 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                    sendMsg(message,"Ваш заказ очищен");
+                    sendMsg(message, "Ваш заказ очищен");
                     break;
                 default:
                     sendMsg(message, "Нет такой команды. Для полного списка команд используйте /help");
@@ -331,37 +323,30 @@ public void takeOrderForUser(Message message){ //блюда из общего з
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-                letmeError = false;
-
-        if (message.getText().contains("Я не хочу ") || (message.getText().contains("я не хочу "))|| (message.getText().contains("Я НЕ ХОЧУ "))) {
-            letmeError=true;
+        letmeError = false;
+        if (message.getText().contains("Я не хочу ") || (message.getText().contains("я не хочу ")) || (message.getText().contains("Я НЕ ХОЧУ "))) {
+            letmeError = true;
             takeUserIdFromDB(message);
-            if(message.getChatId()== userIdFromDB) {
+            if (message.getChatId() == userIdFromDB) {
                 if (Price == 0) {
                     sendMsg(message, "Вы ничего не заказали");
                 } else {
-                   takeOrderForUser(message);
+                    takeOrderForUser(message);
                     for (i = 0; i < DishName.length; i++) {
-
-
                         if ((TotalDishForOrder.contains(DishName[i])) && (message.getText().equalsIgnoreCase("Я не хочу " + DishName[i]))) {//////////////////// тотал строка с заказом( брать из базы)
                             String msgText = message.getText().toLowerCase().replace("я не хочу ", "");
-
-                            TotalDishForOrder="";
-                            TotalPriceForOrder=0;
+                            TotalDishForOrder = "";
+                            TotalPriceForOrder = 0;
                             try {
                                 String DeleteFromOrder = "DELETE  FROM `orders` WHERE dish_name='" + msgText + "' and user_id='" + message.getChatId() + "' LIMIT 1";
                                 BD.stmt.executeUpdate(DeleteFromOrder);
                                 takeOrderForUser(message);
-
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
                         }
                     }
                     sendMsg(message, "Ваш заказ : " + "\n" + TotalDishForOrder + " " + "\n" + "на сумму :" + TotalPriceForOrder + " rub");
-
                     TotalDishForOrder = "";
                     TotalPriceForOrder = 0;
                 }
@@ -369,13 +354,11 @@ public void takeOrderForUser(Message message){ //блюда из общего з
         } else {
             for (i = 0; i < DishName.length; i++) {
                 if ((message.getText().equalsIgnoreCase(DishName[i]))) {
-                    letmeError=true;
-
-                    String[] dish = DishName[i].split(" из ");
-
-                    String sdf = "SELECT * FROM `Dish` WHERE dish_name ='" + dish[0] + "'";
+                    letmeError = true;
+                    String[] dish = DishName[i].split(" и з ");
+                    String aboutdish = "SELECT * FROM `Dish` WHERE dish_name ='" + dish[0] + "'";
                     try {
-                        BD.rs = BD.stmt.executeQuery(sdf);
+                        BD.rs = BD.stmt.executeQuery(aboutdish);
 
                         while (BD.rs.next()) {
                             DishQuery = "SELECT dish.id,dish.dish_name,dish.icons,dish.descr_dish,dish.price,dish.ingredient,res.name,res.id,dishes.acs " +
@@ -413,26 +396,21 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                                         }
                                     }
                                 }
-
-                                } catch(SQLException e){
-                                    e.printStackTrace();
-                                }
+                            } catch (SQLException e) {
+                                e.printStackTrace();
                             }
-
-
+                        }
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
                 }
             }
-
             if (!forKeyWords) {
                 try {
                     DishesonKW = keyw.findDishKW(message);
                     if (DishesonKW != null) {
                         for (i = 0; i < DishesonKW.length; i++) {
-
-                            String[] dish = DishesonKW[i].split(" из ");
+                            String[] dish = DishesonKW[i].split(" и з ");
                             DishQuery = "SELECT dish.id,dish.dish_name,dish.icons,dish.descr_dish,dish.price,dish.ingredient,res.name FROM `dish`,`res`,`dishes`,`key_words` " +
                                     "where dishes.id_dish=dish.id and res.id=dishes.id_res and key_words.id=dishes.id_keyword " +
                                     "and dish.dish_name='" + dish[0].trim() + "' and res.name='" + dish[1].trim() + "'";
@@ -452,8 +430,8 @@ public void takeOrderForUser(Message message){ //блюда из общего з
             }
             forKeyWords = false;
             if (message.getText().equalsIgnoreCase("стоп")) {
-               takeUserIdFromDB(message);
-                if(message.getChatId()== userIdFromDB) {
+                takeUserIdFromDB(message);
+                if (message.getChatId() == userIdFromDB) {
                     if (Dish != null && Price != 0) {
                         takeOrderForUser(message);
                         sendMsg(message, "\tВаш заказ :\n" + TotalDishForOrder + " " + "\nна сумму :" + TotalPriceForOrder + " rub");
@@ -463,14 +441,14 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                     } else {
                         sendMsg(message, "Закажите что-нибудь.Надо поесть");
                     }
+                } else {
+                    sendMsg(message, "Закажите что-нибудь.Надо поесть");
                 }
-                else
-                {sendMsg(message,"Закажите что-нибудь.Надо поесть");}
 
             }
-            userIdFromDB=0;
+            userIdFromDB = 0;
             takeUserIdFromDB(message);
-            if(message.getChatId()== userIdFromDB) {
+            if (message.getChatId() == userIdFromDB) {
                 try {
                     getPhoneAndAddress(message);
                 } catch (SQLException e) {
@@ -478,10 +456,10 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                 }
             }
 
-           takeUserIdFromDB(message);
+            takeUserIdFromDB(message);
 
 
-            if(message.getChatId()== userIdFromDB) {
+            if (message.getChatId() == userIdFromDB) {
                 if ((takePhone != null) && (address != null)) {
                     String gol = message.getText().toLowerCase();
                     switch (gol) {
@@ -502,74 +480,52 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
-
-                            try {
-                                userIdRest = jsonR.takeUserIdRest();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
                             hello(message);
-
                             String ta = TotalDishForLog.replace("\n", "-");
                             String[] boom = ta.split("-");
                             sendMsg(message, "Номер Вашего заказа :" + OrderNumber + "\nОжидайте Ваш заказ.");
-                            ///////////////////////////////
-                            String CACACACACQuery="SELECT DISTINCT id_res FROM `orders` WHERE user_id='"+message.getChatId()+"'";
+                            String idRestQuery = "SELECT DISTINCT id_res FROM `orders` WHERE user_id='" + message.getChatId() + "'";
                             try {
-                                BD.rs = BD.stmt.executeQuery(CACACACACQuery);
+                                BD.rs = BD.stmt.executeQuery(idRestQuery);
                                 while (BD.rs.next()) {
                                     ListOfIds.add(BD.rs.getString(1));
                                 }
                                 RestIds = (String[]) ListOfIds.toArray(new String[ListOfIds.size()]);
-                                    for (i = 0; i < RestIds.length; i++) {
-                                        String SFSDFQuery = "SELECT DISTINCT orders.address,orders.dish_name, orders.price,orders.phone,resbuild.user_id,orders.id " +
-                                                "FROM `orders`,`resbuild` WHERE orders.user_id='" + message.getChatId() + "' and resbuild.id_res=orders.id_res and orders.id_res='" + RestIds[i] + "'";
-                                        try {
-                                            BD.rs = BD.stmt.executeQuery(SFSDFQuery);
-                                            while (BD.rs.next()) {
-                                                TotalDishForRest=BD.rs.getString(2)+"\n"+TotalDishForRest;
-                                                TotalPriceForRest=BD.rs.getInt(3)+TotalPriceForRest;
-                                        cxacaca=BD.rs.getLong(5);
-
-                                            }
-                                            sendMsgToRest(message, "Номер заказа: " + OrderNumber +
-                                                    "\nАдрес клиента: " +  address +
-                                                    "\nТелефон клиента: " + Phone +
-                                                    "\nЗаказ:\n" + TotalDishForRest +
-                                                    "\n\nИтоговая стоимость: " + TotalPriceForRest + " руб",cxacaca);
-                                            TotalDishForRest=" ";
-                                            TotalPriceForRest=0;
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
+                                for (i = 0; i < RestIds.length; i++) {
+                                    String OrderQuery = "SELECT DISTINCT orders.address,orders.dish_name, orders.price,orders.phone,resbuild.user_id,orders.id " +
+                                            "FROM `orders`,`resbuild` WHERE orders.user_id='" + message.getChatId() + "' and resbuild.id_res=orders.id_res and orders.id_res='" + RestIds[i] + "'";
+                                    try {
+                                        BD.rs = BD.stmt.executeQuery(OrderQuery);
+                                        while (BD.rs.next()) {
+                                            TotalDishForRest = BD.rs.getString(2) + "\n" + TotalDishForRest;
+                                            TotalPriceForRest = BD.rs.getInt(3) + TotalPriceForRest;
+                                            UserFromRestID = BD.rs.getLong(5);
                                         }
-                                        try {
-                                            String closrest = jsonR.chooseClosRest(address,RestIds[i]);
-                                            sendMsg(message, closrest);
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
+                                        sendMsgToRest(message, "Номер заказа: " + OrderNumber +
+                                                "\nАдрес клиента: " + address +
+                                                "\nТелефон клиента: " + Phone +
+                                                "\nЗаказ:\n" + TotalDishForRest +
+                                                "\n\nИтоговая стоимость: " + TotalPriceForRest + " руб", UserFromRestID);
+                                        TotalDishForRest = " ";
+                                        TotalPriceForRest = 0;
+                                    } catch (SQLException e) {
+                                        e.printStackTrace();
                                     }
+                                    try {
+                                        closrest = jsonR.chooseClosRest(address, RestIds[i]);
+                                        sendMsg(message, closrest);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    } catch (SQLException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
 
-                            } catch(SQLException e){
-                        e.printStackTrace();
-                    }
-
-
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                            ListOfIds.clear();
                             OrderNumber++;
-
-
-
-
-
-
-
-
-
-
-
-                            ////////////////
                             String DeleteAllFromOrder = "DELETE  FROM `orders` WHERE user_id='" + message.getChatId() + "'";
                             try {
                                 BD.stmt.executeUpdate(DeleteAllFromOrder);
@@ -609,7 +565,7 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                             sendMsg(message, "\nВведите данные повторно");
                             sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
                             takeUserIdFromDB(message);
-                            if(message.getChatId()== userIdFromDB) {
+                            if (message.getChatId() == userIdFromDB) {
                                 try {
                                     getPhoneAndAddress(message);
                                 } catch (SQLException e) {
@@ -620,26 +576,22 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                     }
                 }
             }
-            LoginsQuery="SELECT login FROM res";
+            LoginsQuery = "SELECT login FROM res";
             try {
-                BD.rs=BD.stmt.executeQuery(LoginsQuery);
+                BD.rs = BD.stmt.executeQuery(LoginsQuery);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
             try {
-                while(BD.rs.next())
-                {
-
+                while (BD.rs.next()) {
                     ListOfLogins.add(BD.rs.getString(1));
-
                 }
-                logins=(String[]) ListOfLogins.toArray(new String[ListOfLogins.size()]);
+                logins = (String[]) ListOfLogins.toArray(new String[ListOfLogins.size()]);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
-            for(i=0;i<ListOfLogins.size();i++) {
-                if (message.getText().equals("Time is money "+ logins[i])) {
+            for (i = 0; i < ListOfLogins.size(); i++) {
+                if (message.getText().equals("Time is money " + logins[i])) {
                     Boolean bool = true;
                     Long IdUser = (message.getChatId());
                     String UserFromRest = "SELECT DISTINCT res.login FROM `res`";
@@ -650,7 +602,7 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                     }
                     try {
                         String AddIdUserQuery = "UPDATE resbuild,res SET resbuild.user_id='" + IdUser + "' WHERE resbuild.id_res=res.id " +
-                                "and res.login='"+logins[i]+"'";
+                                "and res.login='" + logins[i] + "'";
                         BD.stmt.executeUpdate(AddIdUserQuery);
                         bool = true;
                     } catch (SQLException e) {
@@ -665,11 +617,11 @@ public void takeOrderForUser(Message message){ //блюда из общего з
                     letmeError = true;
                 }
             }
-            forKeyWords=false;
+            forKeyWords = false;
             if ((takePhone == null) && (address == null) && (DishesonKW == null) && (message.getText().equalsIgnoreCase("стоп") == false)
                     && (message.getText().equalsIgnoreCase("Привет") == false) && (message.getText().contains("Я не хочу") == false)
                     && (message.getText().contains("/") == false) && (letmeError == false) && (message.getText().contains("я не хочу") == false)) {
-                sendMsg(message, "Извините, я вас не понимаю.Для заказа введите ключевое слово или название блюда. Для помощи введите /help");
+                sendMsg(message, "Извините, я вас не понимаю.Для заказа введите ключевое слово или Название блюда и з Название ресторана.\nДля помощи введите /help");
             }
         }
     }

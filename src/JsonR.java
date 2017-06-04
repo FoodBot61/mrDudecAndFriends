@@ -38,10 +38,10 @@ public class JsonR  {
     private Set<Map.Entry<String, Double>> entrySet = Distance.entrySet();
     private String ClosestRest;
     private String AdressClosestRest;
-    private String useridformbd;
     private String IdRest;
     private String user_id;
     private String RestName;
+    private Object[] DistanceValues;
 
     private static String ReadAll(final Reader rd) throws IOException {
         final StringBuilder sb = new StringBuilder();
@@ -106,12 +106,9 @@ public class JsonR  {
 
         String addressQuery = "SELECT resbuild.address,res.name FROM resbuild,res WHERE res.id=resbuild.id_res and resbuild.id_res='"+RestId+"'";
         try {
-
             BD.rs = BD.stmt.executeQuery(addressQuery);
             while (BD.rs.next()) {
                 RestName = BD.rs.getString(2);
-
-
                 RestAddress = BD.rs.getString(1).replace(" ", "_").replace(",", "_");
                 String url = new String("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + ClientAddress.replace(" ", "_").replace(",", "_") + "&destinations=" + RestAddress) + encode(params);
                 final JSONObject response = JsonR.read(url);
@@ -119,8 +116,7 @@ public class JsonR  {
                 String timebetween2loc = response.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject("duration").getString("text").replace("mins", "").replace("min", "").trim();
                 double TimetoRest = Double.parseDouble(timebetween2loc) + 10;
                 Distance.put(RestAddress, TimetoRest);
-
-                Object[] DistanceValues = Distance.values().toArray();
+                DistanceValues = Distance.values().toArray();
                 MinDistance = (double) Distance.values().toArray()[0];
                 for (int i = 0; i < DistanceValues.length; i++) {
                     if (MinDistance > (double) DistanceValues[i]) {
@@ -138,18 +134,12 @@ public class JsonR  {
                         "\nПримерное время доставки : " + ClosestRest.replaceAll(".[А-я].+.[0-9].+=", "").replaceAll(".[0-9]{1}$", "") + " мин";
 
             }
+            entrySet.clear();
         }catch (SQLException e) {
             e.printStackTrace();
-        } return ClosestRest;
-    }
-
-    public String takeUserIdRest() throws SQLException {
-        String UserIdQuery = "SELECT user_id FROM resbuild WHERE address='" + AdressClosestRest + "'";
-        BD.rs = BD.stmt.executeQuery(UserIdQuery);
-        while (BD.rs.next()) {
-            useridformbd = BD.rs.getString(1);//id телеграм акка человека, прикрепленного за рестораном
         }
-        return useridformbd;
+
+        return ClosestRest;
     }
 
     public String takeIdRest() throws SQLException {

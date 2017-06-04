@@ -34,7 +34,7 @@ public class SuperKeyWord {
                         " and dish.id=dishes.id_dish and key_words.id=dishes.id_keyword and res.id=dishes.id_res and dishes.acs=1";
                                        BD.rs = BD.stmt.executeQuery(sql);
                                         while (BD.rs.next()) {
-                                            String dish=BD.rs.getString(1)+" из "+BD.rs.getString(2);
+                                            String dish=BD.rs.getString(1)+" и з "+BD.rs.getString(2);
                                             ListofDish.add(dish);
                                         }
                 Dishes = (String[]) ListofDish.toArray(new String[ListofDish.size()]);
