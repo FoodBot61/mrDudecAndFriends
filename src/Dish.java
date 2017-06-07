@@ -14,7 +14,7 @@ public class Dish {
 
     public String[] findDish() throws SQLException {
         DishQuery = "SELECT DISTINCT dish.dish_name,res.name FROM `dish`,`res`,`dishes` " +    //запрос на все блюда
-                "WHERE res.id=dishes.id_res and dish.id=dishes.id_dish";
+                "WHERE res.id=dish.id_res and dish.id=dishes.id_dish";
         BD.rs = BD.stmt.executeQuery(DishQuery);
         while (BD.rs.next()) {
             rowValues.add(BD.rs.getString(1)+" и з "+BD.rs.getString(2));//list всех блюд

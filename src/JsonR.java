@@ -42,7 +42,7 @@ public class JsonR  {
     private String user_id;
     private String RestName;
     private Object[] DistanceValues;
-
+    private static final String API_KEY ="AIzaSyBmsR-jsIN74P-KwHdwzh37rzwBCrQICvU";
     private static String ReadAll(final Reader rd) throws IOException {
         final StringBuilder sb = new StringBuilder();
         int cp;
@@ -102,19 +102,19 @@ public class JsonR  {
         return ClientAddress;
     }
 
-    public String chooseClosRest(String ClientAddress,String RestId) throws IOException, SQLException {
-
+    public String chooseClosRest(String ClientAddress, String RestId, double MaxTime) throws IOException, SQLException {
         String addressQuery = "SELECT resbuild.address,res.name FROM resbuild,res WHERE res.id=resbuild.id_res and resbuild.id_res='"+RestId+"'";
         try {
             BD.rs = BD.stmt.executeQuery(addressQuery);
             while (BD.rs.next()) {
                 RestName = BD.rs.getString(2);
                 RestAddress = BD.rs.getString(1).replace(" ", "_").replace(",", "_");
-                String url = new String("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + ClientAddress.replace(" ", "_").replace(",", "_") + "&destinations=" + RestAddress) + encode(params);
+                String url = new String("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + ClientAddress.replace(" ", "_").replace(",", "_") + "&destinations=" +
+                        RestAddress+"&traffic_model&departure_time=now&key="+API_KEY) + encode(params);
                 final JSONObject response = JsonR.read(url);
                 //время в пути без учета пробок между рестораном и адресом клиента
-                String timebetween2loc = response.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject("duration").getString("text").replace("mins", "").replace("min", "").trim();
-                double TimetoRest = Double.parseDouble(timebetween2loc) + 10;
+                String timebetween2loc = response.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject("duration_in_traffic").getString("text").replace("mins", "").replace("min", "").trim();
+                double TimetoRest = Double.parseDouble(timebetween2loc) + MaxTime;
                 Distance.put(RestAddress, TimetoRest);
                 DistanceValues = Distance.values().toArray();
                 MinDistance = (double) Distance.values().toArray()[0];
@@ -123,6 +123,7 @@ public class JsonR  {
                         MinDistance = (double) DistanceValues[i];
                     }
                 }
+
                 Object KeytoRest = MinDistance;
                 for (Map.Entry<String, Double> pair : entrySet) {
                     if (KeytoRest.equals(pair.getValue())) {

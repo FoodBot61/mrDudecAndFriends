@@ -10,6 +10,7 @@ import org.telegram.telegrambots.exceptions.TelegramApiException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,7 +60,8 @@ public class SimpleBot extends TelegramLongPollingBot {
     private String TotalDishForOrder = " ";
     private int userIdFromDB;
     private List ListOfLogins = new ArrayList();
-
+    private int DishId;
+    HashMap <String,String> MaxTimeToCook = new HashMap<>();
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
@@ -250,8 +252,8 @@ public class SimpleBot extends TelegramLongPollingBot {
                             "1 :Введите ключевое слово.Ключевые слова это общее название блюда, например: шаурма, суп\n" +
                             "2 :Чтобы заказать блюдо из списка введите '\nНазвание блюда и з Название ресторана'\n.Названия блюд и ресторанов в точности как в списке\n" +
                             "Например: Суп и з Ресторан\n" +
-                            "3 :Если необходимо вычеркнуть блюдо из общего заказа, введите Я не хочу Название Блюда и з Название ресторана\n"+
-                            "Например: Я не хочу Суп и з Ресторан\n"+
+                            "3 :Если необходимо вычеркнуть блюдо из общего заказа, введите Я не хочу Название Блюда и з Название ресторана\n" +
+                            "Например: Я не хочу Суп и з Ресторан\n" +
                             "4 :Для того, чтобы завершить заказ введите Стоп\n" +
                             "5 :Для связи с вами потребуется Ваш номер мобильного телефона. После завершения заказа, вы не сможете его отменить.\n" +
                             "6 :Почти последним шагом является ввод Вашего адреса. Если вы ошиблись при вводе, вы сможете изменить данные чуть позже.\n" +
@@ -363,7 +365,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                         while (BD.rs.next()) {
                             DishQuery = "SELECT dish.id,dish.dish_name,dish.icons,dish.descr_dish,dish.price,dish.ingredient,res.name,res.id,dishes.acs " +
                                     "FROM `dish`,`res`,`dishes` where dish_name='" + dish[0].trim() + "'" +
-                                    " and dishes.id_dish=dish.id and res.id=dishes.id_res and res.name='" + dish[1].trim() + "'";
+                                    " and dishes.id_dish=dish.id and res.id=dish.id_res and res.name='" + dish[1].trim() + "'";
                             try {
                                 BD.rs = BD.stmt.executeQuery(DishQuery);
                                 while (BD.rs.next()) {
@@ -377,12 +379,14 @@ public class SimpleBot extends TelegramLongPollingBot {
                                         Dish = DishName[i];
                                         Price = BD.rs.getInt(5);
                                         IdRest = BD.rs.getInt(8);
+                                        DishId = BD.rs.getInt(1);
                                         TotalDishForLog = "dish=" + BD.rs.getString(2) + "price=" + BD.rs.getInt(5) + "id=" + BD.rs.getString(1) + "\n" + TotalDishForLog;
                                         try {
                                             String UpdateOrder = "INSERT INTO orders SET" +
                                                     " dish_name = '" + Dish + "'," +
                                                     "price ='" + Price + "', user_id ='" + user_id + "'," +
                                                     "id_res = '" + IdRest + "'," +
+                                                    "id_dish = '" + DishId + "'," +
                                                     "address = 'address'," + "phone = 0";
                                             BD.stmt.executeUpdate(UpdateOrder);
                                             takeOrderForUser(message);
@@ -412,7 +416,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                         for (i = 0; i < DishesonKW.length; i++) {
                             String[] dish = DishesonKW[i].split(" и з ");
                             DishQuery = "SELECT dish.id,dish.dish_name,dish.icons,dish.descr_dish,dish.price,dish.ingredient,res.name FROM `dish`,`res`,`dishes`,`key_words` " +
-                                    "where dishes.id_dish=dish.id and res.id=dishes.id_res and key_words.id=dishes.id_keyword " +
+                                    "where dishes.id_dish=dish.id and res.id=dish.id_res and key_words.id=dishes.id_keyword " +
                                     "and dish.dish_name='" + dish[0].trim() + "' and res.name='" + dish[1].trim() + "'";
                             sendMsg(message, (i + 1 + ")"));
                             BD.rs = BD.stmt.executeQuery(DishQuery);
@@ -444,7 +448,20 @@ public class SimpleBot extends TelegramLongPollingBot {
                 } else {
                     sendMsg(message, "Закажите что-нибудь.Надо поесть");
                 }
-
+                String MaxTimetoCookQuery = "SELECT DISTINCT orders.id_res, MAX(dish.timetocook) FROM orders,dish" +
+                        " WHERE user_id='" + message.getChatId() + "' and dish.id=orders.id_dish GROUP BY dish.id_res";
+                try {
+                    BD.rs = BD.stmt.executeQuery(MaxTimetoCookQuery);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    while (BD.rs.next()) {
+                        MaxTimeToCook.put(BD.rs.getString(1),BD.rs.getString(2));
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
             userIdFromDB = 0;
             takeUserIdFromDB(message);
@@ -455,7 +472,6 @@ public class SimpleBot extends TelegramLongPollingBot {
                     e.printStackTrace();
                 }
             }
-
             takeUserIdFromDB(message);
 
 
@@ -512,8 +528,9 @@ public class SimpleBot extends TelegramLongPollingBot {
                                         e.printStackTrace();
                                     }
                                     try {
-                                        closrest = jsonR.chooseClosRest(address, RestIds[i]);
+                                        closrest = jsonR.chooseClosRest(address,RestIds[i], Double.parseDouble(MaxTimeToCook.get(RestIds[i])));
                                         sendMsg(message, closrest);
+
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     } catch (SQLException e) {
