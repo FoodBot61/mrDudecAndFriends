@@ -1,5 +1,3 @@
-import org.telegram.telegrambots.api.objects.Message;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +6,7 @@ import java.util.List;
  * Created by user on 27.01.2017.
  */
 public class Dish {
-    private String[] ListofDishh;
+    private String[] ListofDish;
     private List rowValues = new ArrayList();
     private String DishQuery;
 
@@ -19,7 +17,7 @@ public class Dish {
         while (BD.rs.next()) {
             rowValues.add(BD.rs.getString(1)+" и з "+BD.rs.getString(2));//list всех блюд
         }
-        ListofDishh = (String[]) rowValues.toArray(new String[rowValues.size()]);
-        return ListofDishh;
+        ListofDish = (String[]) rowValues.toArray(new String[rowValues.size()]);
+        return ListofDish;
     }
 }
