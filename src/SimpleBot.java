@@ -42,7 +42,6 @@ public class SimpleBot extends TelegramLongPollingBot {
     private String userPhone;
     private String Phone;
     private String address;
-    private String TotalDish = " ";
     private JsonR jsonR;
     private String user_name;
     private String user_secname;
@@ -63,11 +62,9 @@ public class SimpleBot extends TelegramLongPollingBot {
     private int DishId;
     private boolean takeaddress=true;
     HashMap <String,String> MaxTimeToCook = new HashMap<>();
-
-
-
-    String amount;
-    boolean gotoorder=true;
+    private boolean pressstop = false;
+    private boolean PhoneAway = false;
+    private boolean AddressAway= false;
     public static void main(String[] args) throws IOException {
         ApiContextInitializer.init();
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
@@ -104,13 +101,14 @@ public class SimpleBot extends TelegramLongPollingBot {
     public String getPhoneNumb(Message message) {
         String msgText;
         String phone = null;
-        msgText = message.getText();
-        Pattern p = Pattern.compile("89.[0-9]{8}");
-        Matcher m = p.matcher(msgText);
-        if (m.find()) {
-            phone = msgText.substring(m.end() - 11, m.end());
+            msgText = message.getText();
+            Pattern p = Pattern.compile("89.[0-9]{8}");
+            Matcher m = p.matcher(msgText);
+            if (m.find()) {
+                phone = msgText.substring(m.end() - 11, m.end());
         }
-        return phone;
+            return phone;
+
     }
 
     private void sendMsgToRest(Message message, String text, long userIdRest) {
@@ -161,23 +159,27 @@ public class SimpleBot extends TelegramLongPollingBot {
 
     public void getPhoneAndAddress(Message message) throws SQLException {
         forKeyWords=true;
-        if (TotalDishForOrder != null) {
+        if ((TotalDishForOrder!= null) && (pressstop)) {
+            letmeError = true;
             userPhone = getPhoneNumb(message);
-            if (message.getText().equals(userPhone)) {
-                takeaddress =false;
-                sendMsg(message, "Укажите адрес, куда нужно доставить еду.");
-                takePhone = message.getText();
-                Phone = takePhone;
-                String updatePhone = "UPDATE orders SET phone = '" + Phone + "' where user_id='" + message.getChatId() + "'";
-                try {
-                    BD.stmt.executeUpdate(updatePhone);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            if ((userPhone == null) && (!PhoneAway)) {
+                sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
+            } else {
+                if (message.getText().equals(userPhone)) {
+                    PhoneAway = true;
+                    takeaddress = false;
+                    takePhone = message.getText();
+                    Phone = takePhone;
+                    String updatePhone = "UPDATE orders SET phone = '" + Phone + "' where user_id='" + message.getChatId() + "'";
+                    try {
+                        BD.stmt.executeUpdate(updatePhone);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
-        if ((takePhone != null) & (message.getText().matches("[0-9]{0,4}[^0-9]{0,2}[а-я].+[0-9]{1,4}[^а-я]{0,1}[А-я]{0,1}"))) {
-
+        if ((Phone != null) &  (pressstop)& (message.getText().matches("[0-9]{0,4}[^0-9]{0,2}[а-я].+[0-9]{1,4}[^а-я]{0,1}[А-я]{0,1}"))) {
             context = new GeoApiContext().setApiKey("AIzaSyAg5cKfRFcLIxAUuPSs8IFXX5dnbH844uw");
             address = jsonR.makeURL(message);
             sendMsg(message, address);
@@ -191,6 +193,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
+                AddressAway = true;
                 String caca1 = "SELECT address,phone FROM orders where user_id='" + message.getChatId() + "'";
                 try {
                     BD.rs = BD.stmt.executeQuery(caca1);
@@ -208,6 +211,12 @@ public class SimpleBot extends TelegramLongPollingBot {
             }
             forKeyWords = false;
             takeaddress =true;
+        }
+        else
+        {
+            if((Phone!=null)&&(!AddressAway)&&(pressstop)) {
+                sendMsg(message, "Укажите адрес, куда нужно доставить еду. Например Большая Садовая 91");
+            }
         }
     }
 
@@ -262,10 +271,8 @@ public class SimpleBot extends TelegramLongPollingBot {
                             "1 :Введите ключевое слово.Ключевые слова это общее название блюда, например: шаурма, суп\n" +
                             "2 :Чтобы заказать блюдо из списка введите '\nНазвание блюда и з Название ресторана'\n.Названия блюд и ресторанов в точности как в списке\n" +
                             "Например: Суп и з Ресторан\n" +
-                            "Также Вы можете указывать количество блюд. Например: Название блюда и з Название ресторана х5\n"+
                             "3 :Если необходимо вычеркнуть блюдо из общего заказа, введите Я не хочу Название Блюда и з Название ресторана\n" +
                             "Например: Я не хочу Суп и з Ресторан\n" +
-                            "Также Вы можете указывать количество блюд. Например: Я не хочу Суп и з Ресторан х5\n"+
                             "4 :Для того, чтобы завершить заказ введите Стоп\n" +
                             "5 :Для связи с вами потребуется Ваш номер мобильного телефона. После завершения заказа, вы не сможете его отменить.\n" +
                             "6 :Почти последним шагом является ввод Вашего адреса. Если вы ошиблись при вводе, вы сможете изменить данные чуть позже.\n" +
@@ -349,18 +356,11 @@ public class SimpleBot extends TelegramLongPollingBot {
                 } else {
                     takeOrderForUser(message);
                     for (i = 0; i < DishName.length; i++) {
-                        if ((TotalDishForOrder.contains(DishName[i])) && (message.getText().contains("Я не хочу " + DishName[i]))) {//////////////////// тотал строка с заказом( брать из базы)
-                            if((message.getText().matches(".*х[0-9]{1,}$"))||(message.getText().matches(".*x[0-9]{1,}$"))) {
-                                amount = message.getText().toLowerCase().replace(DishName[i].toLowerCase(), "").replace("я не хочу","").replace("х", "").replace("x", "").trim();
-                            }
-                            else
-                            {
-                                amount="1";
-                            }
+                        if ((TotalDishForOrder.contains(DishName[i])) && (message.getText().equalsIgnoreCase("Я не хочу " + DishName[i]))) {//////////////////// тотал строка с заказом( брать из базы)
                             TotalDishForOrder = "";
                             TotalPriceForOrder = 0;
                             try {
-                                String DeleteFromOrder = "DELETE  FROM `orders` WHERE dish_name='" + DishName[i] + "' and user_id='" + message.getChatId() + "' LIMIT "+(amount)+"";
+                                String DeleteFromOrder = "DELETE  FROM `orders` WHERE dish_name='" + DishName[i] + "' and user_id='" + message.getChatId() + "' LIMIT 1";
                                 BD.stmt.executeUpdate(DeleteFromOrder);
                                 takeOrderForUser(message);
                             } catch (SQLException e) {
@@ -375,15 +375,8 @@ public class SimpleBot extends TelegramLongPollingBot {
             }
         } else {
             for (i = 0; i < DishName.length; i++) {
-                    if ((message.getText().contains(DishName[i]))) {
-                        if((message.getText().matches(".*х[0-9]{1,}$"))||(message.getText().matches(".*x[0-9]{1,}$"))){
-                        amount = message.getText().replace(DishName[i], "").replace("х", "").replace("x", "").trim();
+                    if ((message.getText().equalsIgnoreCase(DishName[i]))) {
                         letmeError = true;
-                        }
-                        else {
-                            amount="1";
-                            letmeError = true;
-                        }
                         String[] dish = DishName[i].split(" и з ");
                         String aboutdish = "SELECT * FROM `Dish` WHERE dish_name ='" + dish[0] + "'";
                         try {
@@ -408,8 +401,6 @@ public class SimpleBot extends TelegramLongPollingBot {
                                             DishId = BD.rs.getInt(1);
                                             TotalDishForLog = "dish=" + BD.rs.getString(2) + "price=" + BD.rs.getInt(5) + "id=" + BD.rs.getString(1) + "\n" + TotalDishForLog;
                                             try {
-
-                                                for (i = 0; i < Integer.valueOf(amount); i++) {
                                                     String UpdateOrder = "INSERT INTO orders SET" +
                                                             " dish_name = '" + Dish + "'," +
                                                             "price ='" + Price + "', user_id ='" + user_id + "'," +
@@ -417,7 +408,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                                                             "id_dish = '" + DishId + "'," +
                                                             "address = 'address'," + "phone = 0";
                                                     BD.stmt.executeUpdate(UpdateOrder);
-                                                }
+
                                                 takeOrderForUser(message);
                                                 sendMsg(message, "Итоговая стоимость = " + TotalPriceForOrder + " rub");
                                                 sendMsg(message, "Итоговый заказ : " + "\n" + TotalDishForOrder);//приколы с пустыми строками
@@ -464,6 +455,7 @@ public class SimpleBot extends TelegramLongPollingBot {
             }
             forKeyWords = false;
             if (message.getText().equalsIgnoreCase("стоп")) {
+                pressstop=true;
                 takeUserIdFromDB(message);
                 if (message.getChatId() == userIdFromDB) {
                     if (Dish != null && Price != 0) {
@@ -471,7 +463,6 @@ public class SimpleBot extends TelegramLongPollingBot {
                         sendMsg(message, "\tВаш заказ :\n" + TotalDishForOrder + " " + "\nна сумму :" + TotalPriceForOrder + " rub");
                         TotalDishForOrder = " ";
                         TotalPriceForOrder = 0;
-                        sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
                     } else {
                         sendMsg(message, "Закажите что-нибудь.Надо поесть");
                     }
@@ -560,14 +551,12 @@ public class SimpleBot extends TelegramLongPollingBot {
                                     try {
                                         closrest = jsonR.chooseClosRest(address,RestIds[i], Double.parseDouble(MaxTimeToCook.get(RestIds[i])));
                                         sendMsg(message, closrest);
-
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     } catch (SQLException e) {
                                         e.printStackTrace();
                                     }
                                 }
-
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
@@ -607,10 +596,21 @@ public class SimpleBot extends TelegramLongPollingBot {
                                     sqlEx.printStackTrace();
                                 }
                             }
+                            Phone=null;
+                            address=null;
+                            pressstop = false;
+                            PhoneAway = false;
+                            AddressAway= false;
                             break;
                         case "нет":
+                            Phone=null;
+                            address=null;
+                            pressstop = true;
+                            PhoneAway = false;
+                            AddressAway= false;
                             sendMsg(message, "\nВведите данные повторно");
-                            sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
+                            //sendMsg(message, "Введите номер мобильного телефона ( по формату 89ХХХХХХХХХ), чтобы курьер смог связаться с вами");
+
                             takeUserIdFromDB(message);
                             if (message.getChatId() == userIdFromDB) {
                                 try {
@@ -621,6 +621,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                             }
                             break;
                     }
+
                 }
             }
             LoginsQuery = "SELECT login FROM res";
