@@ -54,7 +54,7 @@ public class SimpleBot extends TelegramLongPollingBot {
     private String TotalDishForRest = " ";
     private int TotalPriceForRest;
     private Boolean letmeError;
-    private String TotalDishForLog;
+    private String TotalDishForLog= " ";
     private int TotalPriceForOrder;
     private String TotalDishForOrder = " ";
     private int userIdFromDB;
@@ -102,7 +102,7 @@ public class SimpleBot extends TelegramLongPollingBot {
         String msgText;
         String phone = null;
             msgText = message.getText();
-            Pattern p = Pattern.compile("89.[0-9]{8}");
+            Pattern p = Pattern.compile("89.[0-9]{8}$");
             Matcher m = p.matcher(msgText);
             if (m.find()) {
                 phone = msgText.substring(m.end() - 11, m.end());
@@ -114,7 +114,6 @@ public class SimpleBot extends TelegramLongPollingBot {
     private void sendMsgToRest(Message message, String text, long userIdRest) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(false);
-        sendMessage.setChatId(userIdRest);
         sendMessage.setChatId(userIdRest);
         sendMessage.setText(text);
         try {
@@ -269,7 +268,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                             "\t Описание работы с ботом \n\n" +
                             "Для начала заказа следуйте инструкции:\n" +
                             "1 :Введите ключевое слово.Ключевые слова это общее название блюда, например: шаурма, суп\n" +
-                            "2 :Чтобы заказать блюдо из списка введите '\nНазвание блюда и з Название ресторана'\n.Названия блюд и ресторанов в точности как в списке\n" +
+                            "2 :Чтобы заказать блюдо из списка введите '\nНазвание блюда и з Название ресторана'\n.Названия блюд и ресторано ввводите в точности как в списке\n" +
                             "Например: Суп и з Ресторан\n" +
                             "3 :Если необходимо вычеркнуть блюдо из общего заказа, введите Я не хочу Название Блюда и з Название ресторана\n" +
                             "Например: Я не хочу Суп и з Ресторан\n" +
@@ -279,7 +278,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                             "7 :И после того, как вы все подтвердили вы увидите примерное время Вашего заказа. Ожидайте звонка курьера.\n" +
                             "Дальнейшее использование чат-бота подтверждает, что Вы согласны на хранение и обработку Вашим персональных данных, если Вы не согласны, пожалуйста выйдите!\n" +
                             "Ознакомиться с пользовательским соглашением Вы можете здесь : " +
-                            "\nОзнакомиться с политикой в отношении обработки персональных данных Вы можете здесь ");
+                            "\nОзнакомиться с политикой в отношении обработки персональных данных Вы можете здесь : ");
                     break;
                 case "/favlist":
                     String favlistQuery = "SELECT dish,COUNT(id_dish) FROM `log` WHERE user_id='" + user_id + "' GROUP BY id_dish ORDER BY COUNT(*) DESC LIMIT 4";
@@ -529,7 +528,7 @@ public class SimpleBot extends TelegramLongPollingBot {
                                 }
                                 RestIds = (String[]) ListOfIds.toArray(new String[ListOfIds.size()]);
                                 for (i = 0; i < RestIds.length; i++) {
-                                    String OrderQuery = "SELECT DISTINCT orders.address,orders.dish_name, orders.price,orders.phone,resbuild.user_id,orders.id " +
+                                    String OrderQuery = "SELECT DISTINCT orders.address,orders.dish_name, orders.price,orders.phone,resbuild.user_id " +
                                             "FROM `orders`,`resbuild` WHERE orders.user_id='" + message.getChatId() + "' and resbuild.id_res=orders.id_res and orders.id_res='" + RestIds[i] + "'";
                                     try {
                                         BD.rs = BD.stmt.executeQuery(OrderQuery);

@@ -41,6 +41,7 @@ public class JsonR  {
     private String IdRest;
     private String user_id;
     private String RestName;
+    private String RestPhone;
     private Object[] DistanceValues;
     private static final String API_KEY ="AIzaSyBmsR-jsIN74P-KwHdwzh37rzwBCrQICvU";
     private static String ReadAll(final Reader rd) throws IOException {
@@ -103,11 +104,12 @@ public class JsonR  {
     }
 
     public String chooseClosRest(String ClientAddress, String RestId, double MaxTime) throws IOException, SQLException {
-        String addressQuery = "SELECT resbuild.address,res.name FROM resbuild,res WHERE res.id=resbuild.id_res and resbuild.id_res='"+RestId+"'";
+        String addressQuery = "SELECT resbuild.address,res.name,res.phone FROM resbuild,res WHERE res.id=resbuild.id_res and resbuild.id_res='"+RestId+"'";
         try {
             BD.rs = BD.stmt.executeQuery(addressQuery);
             while (BD.rs.next()) {
                 RestName = BD.rs.getString(2);
+                RestPhone=BD.rs.getString(3);
                 RestAddress = BD.rs.getString(1).replace(" ", "_").replace(",", "_");
                 String url = new String("https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + ClientAddress.replace(" ", "_").replace(",", "_") + "&destinations=" +
                         RestAddress+"&traffic_model&departure_time=now&key="+API_KEY) + encode(params);
@@ -132,7 +134,8 @@ public class JsonR  {
                 }
                 AdressClosestRest = ClosestRest.replaceAll("=.[0-9]+\\.+[0-9]", "").replaceAll("=.*", "").replace("_", " ").replace(".  ", "., ");
                 ClosestRest = "Ближайщий к вам ресторан " + RestName + " находится на " + ClosestRest.replace("_", " ").replace(".", "").replaceAll("=.+[0-9]{1}$", "") +
-                        "\nПримерное время доставки : " + ClosestRest.replaceAll(".[А-я].+.[0-9].+=", "").replaceAll(".[0-9]{1}$", "") + " мин";
+                        "\nПримерное время доставки : " + ClosestRest.replaceAll(".[А-я].+.[0-9].+=", "").replaceAll(".[0-9]{1}$", "") + " мин\n"+
+                "Телефон для связи с рестораном : "+RestPhone;
 
             }
             entrySet.clear();
